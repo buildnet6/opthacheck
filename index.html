@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OphthaCheck v0.5</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#f4f5f7;color:#1d2430}
+  header{background:#15181d;color:white;padding:24px}
+  header h1{margin:0 0 6px;font-size:28px}
+  header p{margin:0;color:#cfd5dd}
+  main{max-width:1100px;margin:24px auto;padding:0 18px}
+  .card{background:white;border:1px solid #ddd;border-radius:12px;padding:20px;margin-bottom:18px}
+  h2{margin-top:0;font-size:20px}
+  label{display:block;font-weight:600;margin:12px 0 6px}
+  input,textarea,select{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bbb;border-radius:7px;font:inherit}
+  textarea{min-height:80px;resize:vertical}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .checks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .checks label{font-weight:normal;margin:0}
+  button{border:0;border-radius:8px;padding:12px 18px;font-weight:700;cursor:pointer;margin:5px 5px 5px 0}
+  .primary{background:#1d2430;color:white}
+  .secondary{background:#e8ebef;color:#1d2430}
+  .danger{background:#f4dede;color:#8a1c1c}
+  .result{white-space:pre-wrap;background:#f7f8fa;border-left:4px solid #1d2430;padding:16px;border-radius:6px}
+  .flag{padding:12px;border-radius:7px;margin:8px 0;background:#fff2d9}
+  .ok{padding:12px;border-radius:7px;margin:8px 0;background:#e4f4e8}
+  small{color:#667085}
+  @media(max-width:700px){.grid,.checks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>OPHTHACHECK v0.5</h1>
+  <p>AI-assisted ophthalmic nursing completeness & handover prototype</p>
+</header>
+
+<main>
+<div class="card">
+  <h2>1. Patient / presentation</h2>
+  <div class="grid">
+    <div><label>Patient ID</label><input id="id"></div>
+    <div><label>Name</label><input id="name"></div>
+    <div><label>Age</label><input id="age" type="number"></div>
+    <div><label>Sex</label><select id="sex"><option>Not recorded</option><option>Female</option><option>Male</option><option>Other / not specified</option></select></div>
+    <div><label>Presentation</label>
+      <select id="presentation">
+        <option>Referral with letter</option>
+        <option>Walk-in without letter</option>
+        <option>Emergency</option>
+      </select>
+    </div>
+    <div><label>Affected eye</label>
+      <select id="eye"><option>Not yet established</option><option>Right</option><option>Left</option><option>Both</option></select>
+    </div>
+    <div><label>Primary complaint</label><input id="complaint"></div>
+  </div>
+  <label>Referral letter / history summary</label>
+  <textarea id="history" placeholder="What the referring hospital says, previous diagnosis, investigations, treatment, surgery, etc."></textarea>
+</div>
+
+
+<div class="card">
+  <h2>2. Dictate the nursing note</h2>
+  <p><small>Instead of typing everything, speak naturally. For example: “Age 56, male. Patient came in with red eyes and blurry vision. The right eye is affected. Pain started yesterday.” The browser will transcribe your speech. Then tap <b>Parse into fields</b>. Review and correct every field before checking the patient.</small></p>
+  <textarea id="dictation" placeholder="Your dictated note will appear here..."></textarea>
+  <button class="primary" id="startDictation" onclick="startDictation()">🎙 Start dictation</button>
+  <button class="secondary" onclick="stopDictation()">Stop</button>
+  <button class="secondary" onclick="parseDictation()">Parse into fields</button>
+  <div id="dictationStatus"><small>Ready.</small></div><div id="environmentStatus" class="status" style="margin-top:8px"></div>
+</div>
+
+<div class="card">
+  <h2>2. Nursing assessment</h2>
+  <div class="grid">
+    <div><label>Visual acuity - Right</label><input id="vaR" placeholder="e.g. 6/12"></div>
+    <div><label>Visual acuity - Left</label><input id="vaL" placeholder="e.g. 6/60"></div>
+    <div><label>IOP - Right</label><input id="iopR"></div>
+    <div><label>IOP - Left</label><input id="iopL"></div>
+    <div><label>Blood pressure</label><input id="bp"></div>
+    <div><label>Blood glucose (if done)</label><input id="glucose"></div>
+  </div>
+
+  <label>Symptoms / observations</label>
+  <div class="checks">
+    <label><input type="checkbox" id="pain"> Pain</label>
+    <label><input type="checkbox" id="watery"> Watery discharge</label>
+    <label><input type="checkbox" id="bloody"> Bloody discharge</label>
+    <label><input type="checkbox" id="trauma"> Ocular injury / trauma</label>
+    <label><input type="checkbox" id="sudden"> Sudden visual change</label>
+    <label><input type="checkbox" id="red"> Red eye</label>
+    <label><input type="checkbox" id="spectacles"> Spectacle wearer</label>
+    <label><input type="checkbox" id="surgery"> Previous eye surgery</label>
+    <label><input type="checkbox" id="cloudy"> Cloudy / hazy vision</label>
+    <label><input type="checkbox" id="halos"> Halos / rainbow rings around lights</label>
+    <label><input type="checkbox" id="nightWorse"> Vision worse at night</label>
+    <label><input type="checkbox" id="brightLight"> Difficulty / reaction to bright light</label>
+    <label><input type="checkbox" id="familyCataract"> Family history of cataract</label>
+  </div>
+
+  <label>Additional nursing observations</label>
+  <textarea id="observations" placeholder="Gait, general appearance, distress, eye appearance, padding, other observations..."></textarea>
+
+  <label>Medical conditions / medications</label>
+  <textarea id="medical" placeholder="Diabetes, hypertension, psychiatric history, other conditions, medications, eye drops..."></textarea>
+</div>
+
+<div class="card">
+  <h2>4. Run OphthaCheck</h2>
+  <button class="primary" onclick="analyse()">CHECK PATIENT</button>
+  <button class="secondary" onclick="makePrompt()">CREATE AI PROMPT</button>
+  <button class="secondary" onclick="window.print()">PRINT</button>
+  <div id="output" style="margin-top:15px"></div>
+</div>
+
+<div class="card">
+  <h2>5. Clinical safety note</h2>
+  <small>Voice transcription may use browser/device speech services. Do not dictate identifiable patient information into an unapproved external speech service. This prototype is a workflow/documentation aid, not a diagnostic or treatment system. It does not replace an ophthalmologist, institutional protocol, emergency pathway, or clinical judgement. Use synthetic/demo data for testing. Do not enter identifiable patient information into an external AI service.</small>
+</div>
+</main>
+
+<script>
+function v(id){return document.getElementById(id).value.trim()}
+function checked(id){return document.getElementById(id).checked}
+
+function analyse(){
+  let missing=[];
+  if(!v("id")) missing.push("Patient ID");
+  if(!v("name")) missing.push("Patient name");
+  if(!v("age")) missing.push("Age");
+  if(!v("complaint")) missing.push("Primary complaint");
+  if(v("presentation")!=="Referral with letter" && !v("history")) missing.push("Relevant history / reason for presentation");
+  if(!v("vaR") && !v("vaL")) missing.push("Visual acuity");
+  if(checked("pain") && !v("observations")) missing.push("Further pain/eye observations");
+  if((checked("watery") || checked("bloody")) && !v("observations")) missing.push("Character/details of discharge");
+  if(checked("trauma") && !v("history")) missing.push("Trauma mechanism / timing / prior management");
+  if(checked("surgery") && !v("history")) missing.push("Previous eye surgery details");
+  if(!v("medical")) missing.push("Medical conditions / medications (or document none reported)");
+  if(/cataract|cloudy|hazy/i.test(v("complaint")+" "+v("history"))){
+    if(!checked("cloudy")) missing.push("Clarify whether the vision is cloudy/hazy");
+    if(!checked("halos")) missing.push("Ask about halos/rainbow rings around lights");
+    if(!checked("nightWorse")) missing.push("Ask whether vision is worse at night");
+    if(!checked("brightLight")) missing.push("Ask about difficulty/reaction to bright light");
+    if(!checked("familyCataract")) missing.push("Ask about family history of cataract");
+  }
+
+  let flags=[];
+  if(v("presentation")==="Emergency") flags.push("EMERGENCY PRESENTATION: follow the clinic's established emergency pathway.");
+  if(checked("trauma")) flags.push("OCULAR TRAUMA: document why the eye is padded/covered if applicable and follow local trauma protocol.");
+  if(checked("sudden")) flags.push("SUDDEN VISUAL CHANGE: requires prompt clinical assessment according to local protocol.");
+  if(checked("bloody")) flags.push("BLOODY DISCHARGE/HEMORRHAGE REPORTED: requires clinical assessment.");
+  if(checked("pain") && checked("red")) flags.push("PAIN + RED EYE: requires clinical assessment.");
+  if((v("iopR") && v("iopL")) && (Number(v("iopR"))>=30 || Number(v("iopL"))>=30))
+    flags.push("IOP value entered at/above 30 mmHg: verify measurement and escalate for clinical review according to local protocol.");
+
+  let out="<h3>OphthaCheck result</h3>";
+  if(missing.length){
+    out += "<div class='flag'><b>Information requiring clarification</b><br>• "+missing.join("<br>• ")+"</div>";
+  } else {
+    out += "<div class='ok'><b>Basic completeness check passed.</b><br>Required MVP fields are populated. Continue with normal clinical workflow.</div>";
+  }
+  if(flags.length) out += "<div class='flag'><b>Attention flags</b><br>• "+flags.join("<br>• ")+"</div>";
+  else out += "<div class='ok'><b>No prototype escalation flags triggered.</b><br>This does not mean the patient is clinically low-risk.</div>";
+
+  out += "<h3>Suggested nursing handover</h3>";
+  out += "<div class='result'>Patient ID: "+(v("id")||"Not recorded")+
+    "\\nName: "+(v("name")||"Not recorded")+
+    "\\nAge: "+(v("age")||"Not recorded")+
+    "\\nPresentation: "+v("presentation")+
+    "\\nAffected eye: "+v("eye")+
+    "\\nComplaint: "+(v("complaint")||"Not recorded")+
+    "\\nVisual acuity R/L: "+(v("vaR")||"NR")+" / "+(v("vaL")||"NR")+
+    "\\nIOP R/L: "+(v("iopR")||"NR")+" / "+(v("iopL")||"NR")+
+    "\\nBP: "+(v("bp")||"NR")+
+    "\\nBlood glucose: "+(v("glucose")||"NR")+
+    "\\nSymptoms/observations: "+(v("observations")||"None recorded")+
+    "\\nMedical conditions/medications: "+(v("medical")||"None recorded")+
+    "\\nReferral/history: "+(v("history")||"None recorded")+"</div>";
+  document.getElementById("output").innerHTML=out.replace(/\\n/g,"<br>");
+}
+
+let recognition=null;
+async function startDictation(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const status=document.getElementById("dictationStatus");
+ if(!window.isSecureContext && location.hostname!=="localhost"){
+   status.innerHTML="<small><b>Microphone blocked:</b> this page is not running in a secure browser context. Use the HTTPS web version of OphthaCheck and allow microphone access.</small>"; return;
+ }
+ if(!SR){status.innerHTML="<small>Speech recognition is not available in this browser. Try current Chrome/Edge or use the phone keyboard microphone.</small>"; return;}
+ try{
+   if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){const stream=await navigator.mediaDevices.getUserMedia({audio:true});stream.getTracks().forEach(t=>t.stop());}
+   recognition=new SR(); recognition.lang="en-NG"; recognition.continuous=true; recognition.interimResults=true;
+   recognition.onstart=()=>{status.innerHTML="<small>Listening… speak naturally. Press Stop when finished.</small>";document.getElementById("startDictation").disabled=true;};
+   recognition.onresult=(e)=>{let t="";for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)t+=e.results[i][0].transcript+" ";}if(t)document.getElementById("dictation").value+=t;};
+   recognition.onerror=(e)=>{let msg=e.error;if(e.error==='not-allowed'||e.error==='service-not-allowed')msg='Microphone/speech recognition was blocked. Check browser permission and use the HTTPS web version.';status.innerHTML="<small>"+msg+"</small>";};
+   recognition.onend=()=>{document.getElementById("startDictation").disabled=false;status.innerHTML="<small>Stopped. Review the transcript before parsing.</small>";};
+   recognition.start();
+ }catch(err){status.innerHTML="<small>Microphone access could not start: "+err.message+"</small>";}
+}
+function stopDictation(){if(recognition)recognition.stop();}
+function parseDictation(){
+ const text=document.getElementById("dictation").value.trim(); if(!text){alert("There is no dictated text to parse.");return;} const l=text.toLowerCase();
+ let m=l.match(/\bage\s*(?:is|:)?\s*(\d{1,3})\b/)||l.match(/\b(\d{1,3})\s*[- ]?year[- ]?old\b/); if(m)document.getElementById("age").value=m[1];
+ if(/\bmale\b|\bman\b|\bgentleman\b/.test(l))document.getElementById("sex").value="Male"; else if(/\bfemale\b|\bwoman\b|\blady\b/.test(l))document.getElementById("sex").value="Female";
+ if(/\bright eye\b|\bright\b/.test(l))document.getElementById("eye").value="Right"; if(/\bleft eye\b|\bleft\b/.test(l))document.getElementById("eye").value="Left"; if(/\bboth eyes\b/.test(l))document.getElementById("eye").value="Both";
+ if(/\bemergency\b|\burgent\b/.test(l))document.getElementById("presentation").value="Emergency";
+ const sm={pain:"pain",watery:"watery|watering|tearing",bloody:"bloody|blood coming|bleeding",trauma:"trauma|injury|injured",sudden:"sudden|suddenly",red:"red eye|red eyes|redness",spectacles:"spectacles|spectacle|glasses",surgery:"previous eye surgery|eye surgery",cloudy:"cloudy|hazy",halos:"halos|halo|rainbow",nightWorse:"worse at night|night vision",brightLight:"bright light|photophobia|light sensitive|light sensitivity",familyCataract:"family history of cataract|cataract in the family"};
+ for(const id in sm)if(new RegExp("(?:"+sm[id]+")","i").test(l))document.getElementById(id).checked=true;
+ const cm=text.match(/(?:complaint|complains? of|presenting with|came in with)\s*[:\-]?\s*([^.;\n]+)/i); if(cm)document.getElementById("complaint").value=cm[1].trim();
+ document.getElementById("observations").value=(document.getElementById("observations").value?document.getElementById("observations").value+" ":"")+text;
+ document.getElementById("dictationStatus").innerHTML="<small>Parsed what the prototype could recognize. <b>Review every field manually before relying on it.</b></small>";
+}
+
+function makePrompt(){
+  const data={
+    id:v("id"), name:v("name"), age:v("age"), sex:v("sex"), presentation:v("presentation"),
+    eye:v("eye"), complaint:v("complaint"), history:v("history"),
+    vaR:v("vaR"), vaL:v("vaL"), iopR:v("iopR"), iopL:v("iopL"),
+    bp:v("bp"), glucose:v("glucose"), pain:checked("pain"), watery:checked("watery"),
+    bloody:checked("bloody"), trauma:checked("trauma"), sudden:checked("sudden"),
+    red:checked("red"), spectacles:checked("spectacles"), surgery:checked("surgery"),
+    cloudyVision:checked("cloudy"), halosRainbow:checked("halos"),
+    worseAtNight:checked("nightWorse"), brightLightReaction:checked("brightLight"),
+    familyHistoryCataract:checked("familyCataract"),
+    observations:v("observations"), medical:v("medical")
+  };
+  const prompt=`You are an ophthalmic nursing workflow assistant. Do NOT diagnose, prescribe, or replace an ophthalmologist. Analyse the following synthetic/demo patient information only.
+
+TASK:
+1. Identify missing or unclear nursing information.
+2. Identify documented features that should be escalated according to the clinic's established protocol.
+3. Produce a concise structured nursing handover.
+4. Suggest patient-education topics that the nurse may need to cover, without giving treatment instructions.
+5. Clearly separate documented facts from suggestions.
+
+PATIENT DATA:
+${JSON.stringify(data,null,2)}
+
+Return sections:
+A. COMPLETENESS
+B. ATTENTION FLAGS
+C. NURSING HANDOVER
+D. PATIENT EDUCATION TOPICS
+E. INFORMATION THAT MUST BE CONFIRMED BY THE CLINICAL TEAM`;
+  document.getElementById("output").innerHTML="<h3>AI prompt generated</h3><div class='result'>"+prompt.replace(/</g,"&lt;")+"</div><p><small>Copy this prompt into ChatGPT/Claude for the AI-assisted layer. Keep identifiable patient data out of external AI systems unless an approved clinical system is being used.</small></p>";
+}
+const env=document.getElementById("environmentStatus");
+if(window.isSecureContext || location.hostname==="localhost") env.innerHTML="<small><b>Voice environment:</b> secure context detected. The browser may request microphone permission.</small>";
+else env.innerHTML="<small><b>Voice environment:</b> this file is opened without HTTPS. Dictation may be blocked. Use the HTTPS web version.</small>";
+</script>
+</body>
+</html>
