@@ -14,7 +14,7 @@ textarea{min-height:70px}button{border:0;border-radius:7px;padding:9px 13px;marg
 .hidden{display:none!important}.muted{font-size:12px;color:#687782}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:7px;border-bottom:1px solid #ccd6dd;text-align:left}
 @media(max-width:700px){.grid{grid-template-columns:1fr}header{position:relative}}@media print{header,.no-print,#login{display:none!important}.card{border:0;box-shadow:none}}
 </style></head><body>
-<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.3.2</small><div id="net"></div></header>
+<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.4</small><div id="net"></div></header>
 
 <section id="login" class="card"><h2>Nurse sign-in</h2>
 <p class="muted">Prototype: profiles and archives are stored locally on this device. This is not yet secure hospital authentication.</p>
@@ -31,7 +31,7 @@ textarea{min-height:70px}button{border:0;border-radius:7px;padding:9px 13px;marg
 <div><label>Sex</label><select id="sex"><option></option><option>Male</option><option>Female</option></select></div><div><label>Occupation</label><input id="occupation"></div><div><label>Phone</label><input id="phone"></div>
 <div><label>BP</label><input id="bp" placeholder="150/90"></div><div><label>RBS/FBS</label><input id="sugar"></div><div><label>Pulse</label><input id="pulse"></div>
 <div><label>Weight</label><input id="weight"></div><div><label>Known DM/HTN</label><input id="comorbidity"></div></div>
-<label>Chief complaint</label><textarea id="complaint"></textarea><button class="light" onclick="dictate('observations')">🎙 Dictate</button></div>
+<label>Chief complaint</label><textarea id="complaint"></textarea><button class="light" onclick="dictateSection('biodata')">🎙 Dictate</button></div>
 
 <div class="card"><h2>B. HISTORY OF PRESENTING COMPLAINT</h2><div class="grid">
 <div><label>Which eye?</label><select id="eye"><option>Not assessed</option><option>Right (RE)</option><option>Left (LE)</option><option>Both (BE)</option></select></div>
@@ -47,22 +47,22 @@ textarea{min-height:70px}button{border:0;border-radius:7px;padding:9px 13px;marg
 <div><label>Spectacle / contact lens use</label><input id="spectacles"></div><div><label>Cloudy / hazy vision</label><select id="hazy"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
 <div><label>Worse at night</label><select id="night"><option>Not assessed</option><option>Yes</option><option>No</option></select></div><div><label>Bright-light difficulty</label><select id="bright"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
 <div><label>Cataract family history</label><select id="cataractFamily"><option>Not assessed</option><option>Yes</option><option>No</option></select></div></div>
-<label>Clinical observations / free dictation</label><textarea id="observations"></textarea><button class="light" onclick="dictate('observations')">🎙 Dictate observations</button></div>
+<label>Clinical observations / free dictation</label><textarea id="observations"></textarea><button class="light" onclick="dictateSection('biodata')">🎙 Dictate observations</button></div>
 
 <div class="card"><h2>C. NURSING EXAMINATION — VA FIRST</h2><div class="alert warn"><b>VA FIRST:</b> Do VA before touching the eye or putting in drops.</div><div class="grid">
 <div><label>VA RE distance</label><input id="vaRE"></div><div><label>VA LE distance</label><input id="vaLE"></div><div><label>VA with pinhole/glasses</label><input id="vaPH"></div>
 <div><label>Near VA</label><input id="nearVA"></div><div><label>Pupils</label><input id="pupils"></div><div><label>Lids / conjunctiva</label><input id="external"></div>
 <div><label>Cornea</label><input id="cornea"></div><div><label>Discharge</label><input id="examDischarge"></div><div><label>Simple tests / eye movement</label><input id="simpleTests"></div>
 <div><label>IOP RE</label><input id="iopRE"></div><div><label>IOP LE</label><input id="iopLE"></div></div>
-<button class="light" onclick="dictate('pupils')">🎙 Dictate examination</button></div>
+<button class="light" onclick="dictateSection('exam')">🎙 Dictate examination</button></div>
 
 <div class="card"><h2>D. RED FLAGS</h2><div id="flags"></div></div>
-<div class="card"><h2>CHECK — WHAT IS STILL MISSING?</h2><div id="missing"></div><button class="green" onclick="check()">✓ Check again</button><button class="light" onclick="dictate('observations')">🎙 Dictate more</button></div>
+<div class="card"><h2>CHECK — WHAT IS STILL MISSING?</h2><div id="missing"></div><button class="green" onclick="check()">✓ Check again</button><button class="light" onclick="dictateSection('biodata')">🎙 Dictate more</button></div>
 
 <div class="card"><h2>E. NURSING ACTION & PLAN</h2><div class="grid">
 <div><label>Drops instilled / time</label><input id="dropsGiven"></div><div><label>Dilated for doctor / drug</label><input id="dilation"></div><div><label>Investigations</label><input id="investigations"></div>
 <div><label>Referral to</label><input id="referral"></div><div><label>Priority</label><select id="priority"><option>Routine</option><option>Urgent</option><option>Emergency</option></select></div></div>
-<label>SBAR summary</label><textarea id="sbar" rows="5"></textarea><button class="green" onclick="sbar()">Generate SBAR</button><button class="light" onclick="dictate('sbar')">🎙 Dictate/correct SBAR</button></div>
+<label>SBAR summary</label><textarea id="sbar" rows="5"></textarea><button class="green" onclick="sbar()">Generate SBAR</button><button class="light" onclick="dictateSection('plan')">🎙 Dictate/correct SBAR</button></div>
 
 <div class="card no-print"><h2>FINALIZE & SHARE</h2><button class="green" onclick="save()">💾 Save to archive</button><button onclick="window.print()">🖨 Print / Save PDF</button><button onclick="share()">📤 Share</button><button onclick="whatsapp()">📱 WhatsApp</button><button onclick="email()">✉ Email</button><button class="light" onclick="exportJSON()">⬇ Export</button></div>
 <div class="card no-print"><h2>MY ARCHIVE</h2><div id="history"></div></div>
@@ -95,187 +95,116 @@ function sbar(){let d=data(),a=[];if(d.age)a.push(d.age+'yr old');if(d.comorbidi
 function save(){let d=data();d.savedAt=new Date().toISOString();d.recordId=Date.now().toString();let a=records();a.unshift(d);localStorage.setItem(AK,JSON.stringify(a));renderHistory();alert('Saved to this nurse archive on this device.')}
 function renderHistory(){let s=S(),a=records().filter(x=>x.staffId===s?.id);q('history').innerHTML=a.length?'<table><tr><th>Date</th><th>Patient</th><th>ID</th><th>Complaint</th><th></th></tr>'+a.map(x=>`<tr><td>${new Date(x.savedAt).toLocaleString()}</td><td>${esc(x.patientName)}</td><td>${esc(x.patientId)}</td><td>${esc(x.complaint)}</td><td><button class="light" onclick="loadRec('${x.recordId}')">Open</button></td></tr>`).join('')+'</table>':'<p class="muted">No saved records.</p>'}
 function loadRec(id){let x=records().find(r=>r.recordId===id);if(!x)return;F.forEach(k=>{if(q(k))q(k).value=x[k]||''});check();scrollTo({top:0,behavior:'smooth'})}
-let activeRecognition=null, activeTarget=null, finalTranscript='', stopRequested=false;
+let activeRecognition=null, activeSection=null, finalTranscript='', stopRequested=false, restartTimer=null;
 let micStream=null, audioContext=null, analyser=null, meterRAF=null;
+const sectionLabels={biodata:'A. Biodata & Vitals',history:'B. History of Presenting Complaint',exam:'C. Nursing Examination',plan:'E. Nursing Action & Plan'};
 
 function ensureDictationPanel(){
   let p=q('dictationPanel');
   if(!p){
-    p=document.createElement('div');
-    p.id='dictationPanel';
-    p.className='card no-print';
+    p=document.createElement('div');p.id='dictationPanel';p.className='card no-print';
     p.innerHTML=`<h2>🎙️ VOICE DICTATION</h2>
-      <div id="dictationStatus" class="alert warn"><b>Ready.</b> Press Start Dictation and speak.</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="green" id="startDictationBtn" onclick="startDictation()">🎙 Start Dictation</button>
-        <button class="red" id="stopDictationBtn" onclick="stopDictation()" disabled>■ Stop</button>
-        <span id="soundLabel" class="pill">🎤 Microphone: idle</span>
-      </div>
-      <div style="margin-top:10px;background:#111;border-radius:8px;padding:10px">
-        <canvas id="voiceMeter" width="900" height="90" style="width:100%;height:90px;display:block"></canvas>
-      </div>
-      <div class="muted" style="margin-top:5px">Sound level: <b id="dbLabel">—</b> <span id="meterHint">No microphone signal yet.</span></div>
-      <div style="margin-top:9px;background:#f7f9fa;border:1px solid #ccd6dd;border-radius:7px;padding:10px;min-height:45px">
-        <b>Live transcript:</b><div id="liveTranscript" class="muted">Nothing heard yet.</div>
-      </div>`;
+    <div id="dictationStatus" class="alert warn"><b>Ready.</b> Choose a section and press Start Dictation.</div>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+      <button class="green" id="startDictationBtn" onclick="startDictation()">🎙 Start</button>
+      <button class="red" id="stopDictationBtn" onclick="stopDictation()" disabled>■ Stop</button>
+      <span id="soundLabel" class="pill">🎤 Microphone: idle</span>
+    </div>
+    <div style="margin-top:7px;background:#111;border-radius:7px;padding:4px">
+      <canvas id="voiceMeter" width="900" height="42" style="width:100%;height:42px;display:block"></canvas>
+    </div>
+    <div class="muted" style="margin-top:2px">Sound: <b id="dbLabel">—</b> <span id="meterHint">No microphone signal yet.</span></div>
+    <div style="margin-top:6px;background:#f7f9fa;border:1px solid #ccd6dd;border-radius:7px;padding:7px">
+      <b>Current section:</b> <span id="dictationSection">Not selected</span><br>
+      <b>Live transcript:</b><div id="liveTranscript" class="muted">Nothing heard yet.</div>
+    </div>
+    <div style="margin-top:6px">
+      <button class="green" id="populateBtn" onclick="populateFromTranscript()" disabled>✓ Review & Populate Fields</button>
+      <button class="light" onclick="clearDictationPreview()">Clear transcript</button>
+    </div>`;
     q('app').insertBefore(p,q('emergency'));
   }
 }
+function dictateSection(section){ensureDictationPanel();activeSection=section;q('dictationSection').textContent=sectionLabels[section]||section;startDictation()}
+function dictate(id){dictateSection('history')}
 
 async function openMicrophone(){
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    throw new Error('This browser does not expose microphone access. Use current Chrome or Edge over HTTPS.');
-  }
-  micStream=await navigator.mediaDevices.getUserMedia({audio:{
-    echoCancellation:true,noiseSuppression:true,autoGainControl:true
-  }});
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error('Microphone access is unavailable. Use current Chrome/Edge over HTTPS.');
+  micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
   audioContext=new (window.AudioContext||window.webkitAudioContext)();
-  const source=audioContext.createMediaStreamSource(micStream);
-  analyser=audioContext.createAnalyser();
-  analyser.fftSize=256;
-  analyser.smoothingTimeConstant=.72;
-  source.connect(analyser);
-  startMeter();
+  const src=audioContext.createMediaStreamSource(micStream);analyser=audioContext.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=.72;src.connect(analyser);startMeter();
 }
-
 function startMeter(){
-  const canvas=q('voiceMeter'),ctx=canvas.getContext('2d'),data=new Uint8Array(analyser.fftSize);
-  const draw=()=>{
-    if(!analyser)return;
-    analyser.getByteTimeDomainData(data);
-    let sum=0;
-    for(const v of data){const n=(v-128)/128;sum+=n*n}
-    const rms=Math.sqrt(sum/data.length);
-    const db=Math.max(-60,20*Math.log10(Math.max(rms,.00001)));
-    q('dbLabel').textContent=(db>-59?db.toFixed(0)+' dB':'below -59 dB');
-    q('meterHint').textContent=db<-45?'Microphone is open, but very little sound is reaching it.':db<-25?'Sound detected — speak normally.':db<-10?'Good speech level.':'Very loud — move the microphone slightly away.';
-    const W=canvas.width,H=canvas.height;
-    ctx.clearRect(0,0,W,H);
-    const bars=36,gap=5,bw=(W-gap*(bars-1))/bars;
-    const level=Math.max(0,Math.min(1,(db+60)/50));
-    for(let i=0;i<bars;i++){
-      const x=i*(bw+gap);
-      const threshold=(i+1)/bars;
-      let on=level>=threshold*.72;
-      const h=10+Math.max(0,H-22)*(i+1)/bars;
-      ctx.fillStyle= i<bars*.65 ? '#39d353' : i<bars*.86 ? '#f2c94c' : '#ff4d4f';
-      ctx.globalAlpha=on?1:.16;
-      ctx.fillRect(x,H-h,bw,h);
-    }
-    ctx.globalAlpha=1;
-    meterRAF=requestAnimationFrame(draw);
-  };
-  cancelAnimationFrame(meterRAF||0); draw();
+  const c=q('voiceMeter'),ctx=c.getContext('2d'),data=new Uint8Array(analyser.fftSize);
+  const draw=()=>{if(!analyser)return;analyser.getByteTimeDomainData(data);let sum=0;
+    for(const v of data){let n=(v-128)/128;sum+=n*n}let rms=Math.sqrt(sum/data.length),db=Math.max(-60,20*Math.log10(Math.max(rms,.00001)));
+    q('dbLabel').textContent=db>-59?db.toFixed(0)+' dB':'below -59 dB';
+    q('meterHint').textContent=db<-45?'Mic open; very little sound.':db<-25?'Sound detected. Speak normally.':db<-10?'Good speech level.':'Very loud.';
+    ctx.clearRect(0,0,c.width,c.height);const bars=48,gap=3,bw=(c.width-gap*(bars-1))/bars,level=Math.max(0,Math.min(1,(db+60)/50));
+    for(let i=0;i<bars;i++){let x=i*(bw+gap),on=level>=((i+1)/bars)*.72,h=5+(c.height-8)*(i+1)/bars;ctx.fillStyle=i<bars*.65?'#39d353':i<bars*.86?'#f2c94c':'#ff4d4f';ctx.globalAlpha=on?1:.13;ctx.fillRect(x,c.height-h,bw,h)}ctx.globalAlpha=1;meterRAF=requestAnimationFrame(draw)};
+  cancelAnimationFrame(meterRAF||0);draw();
 }
-
-function stopMicrophone(){
-  if(meterRAF)cancelAnimationFrame(meterRAF);
-  meterRAF=null;
-  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}
-  if(audioContext){audioContext.close().catch(()=>{});audioContext=null}
-  analyser=null;
-  if(q('soundLabel'))q('soundLabel').textContent='🎤 Microphone: stopped';
-}
-
-function dictate(id){
-  ensureDictationPanel();
-  activeTarget=id;
-  if(activeRecognition){stopDictation();return}
-  startDictation();
-}
+function stopMicrophone(){if(meterRAF)cancelAnimationFrame(meterRAF);meterRAF=null;if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}if(audioContext){audioContext.close().catch(()=>{});audioContext=null}analyser=null;if(q('soundLabel'))q('soundLabel').textContent='🎤 Microphone: stopped'}
 
 async function startDictation(){
-  ensureDictationPanel();
-  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!R){
-    q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Speech recognition is unavailable in this browser.</b> Try current Chrome or Edge.';
-    return;
-  }
-  if(!activeTarget)activeTarget='observations';
-  stopRequested=false;finalTranscript='';
-  q('liveTranscript').textContent='Waiting for speech…';
-  q('startDictationBtn').disabled=true;q('stopDictationBtn').disabled=true;
-
-  try{
-    await openMicrophone();
-    q('soundLabel').textContent='🎤 Microphone: LIVE';
-  }catch(e){
-    q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Microphone could not be opened.</b> '+esc(e.message)+'<br><small>Check the microphone permission in the address bar, then reload this page.</small>';
-    q('startDictationBtn').disabled=false;
-    return;
-  }
-
-  q('dictationStatus').className='alert ok';
-  q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — speak now. You should see the green/yellow/red sound bars moving.';
-  q('startDictationBtn').classList.add('hidden');
-  q('stopDictationBtn').disabled=false;
-  q('stopDictationBtn').classList.remove('hidden');
-
-  const r=new R();activeRecognition=r;
-  r.lang='en-US';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
-  r.onstart=()=>{
-    q('dictationStatus').className='alert ok';
-    q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — microphone live. Speak now.';
-  };
-  r.onresult=e=>{
-    let interim='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal)finalTranscript+=(finalTranscript?' ':'')+t;
-      else interim+=(interim?' ':'')+t;
-    }
-    q('liveTranscript').textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';
-  };
-  r.onerror=e=>{
-    const friendly={
-      'not-allowed':'Microphone permission was denied. Allow microphone access for this site and reload.',
-      'service-not-allowed':'The browser speech-recognition service is unavailable.',
-      'no-speech':'No speech was detected. The microphone meter should still move if sound is reaching the browser.',
-      'audio-capture':'No microphone was available.',
-      'network':'The browser speech-recognition service needs network access.',
-      'aborted':'Dictation was stopped.'
-    };
-    q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Speech recognition:</b> '+esc(friendly[e.error]||e.error);
-  };
-  r.onend=()=>{
-    activeRecognition=null;stopMicrophone();
-    q('startDictationBtn').classList.remove('hidden');q('startDictationBtn').disabled=false;
-    q('stopDictationBtn').disabled=true;
-    if(finalTranscript.trim()){
-      const target=q(activeTarget);
-      if(target)target.value+=(target.value?' ':'')+finalTranscript.trim();
-      q('dictationStatus').className='alert ok';
-      q('dictationStatus').innerHTML='<b>✓ Dictation captured.</b> Review it before checking.';
-      check();
-    }else if(stopRequested){
-      q('dictationStatus').className='alert warn';
-      q('dictationStatus').innerHTML='<b>Dictation stopped.</b> No words were captured by speech recognition.';
-    }
-  };
-  try{r.start()}catch(e){
-    activeRecognition=null;stopMicrophone();
-    q('startDictationBtn').classList.remove('hidden');q('startDictationBtn').disabled=false;
-    q('stopDictationBtn').disabled=true;
-    q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Could not start speech recognition:</b> '+esc(e.message);
-  }
+  ensureDictationPanel();const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!R){q('dictationStatus').className='alert danger';q('dictationStatus').innerHTML='<b>Speech recognition is unavailable.</b> Try current Chrome or Edge.';return}
+  if(!activeSection)activeSection='history';q('dictationSection').textContent=sectionLabels[activeSection];stopRequested=false;finalTranscript='';
+  q('liveTranscript').textContent='Waiting for speech…';q('populateBtn').disabled=true;q('startDictationBtn').disabled=true;q('stopDictationBtn').disabled=true;
+  try{await openMicrophone();q('soundLabel').textContent='🎤 Microphone: LIVE'}catch(e){q('dictationStatus').className='alert danger';q('dictationStatus').innerHTML='<b>Microphone could not be opened.</b> '+esc(e.message);q('startDictationBtn').disabled=false;return}
+  q('dictationStatus').className='alert ok';q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — speak now.';
+  q('startDictationBtn').classList.add('hidden');q('stopDictationBtn').disabled=false;
+  const launch=()=>{if(stopRequested)return;const r=new R();activeRecognition=r;r.lang='en-US';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
+    r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=(finalTranscript?' ':'')+t;else interim+=(interim?' ':'')+t}q('liveTranscript').textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';if(finalTranscript)q('populateBtn').disabled=false};
+    r.onerror=e=>{if(e.error==='no-speech'&&!stopRequested){restartTimer=setTimeout(launch,300);return}const msg={not-allowed:'Microphone permission denied. Allow it for this site and reload.',network:'Speech recognition needs network access.',audio-capture:'No microphone available.',service-not-allowed:'Browser speech service unavailable.'}[e.error]||e.error;q('dictationStatus').className='alert danger';q('dictationStatus').innerHTML='<b>Speech recognition:</b> '+esc(msg)};
+    r.onend=()=>{activeRecognition=null;if(!stopRequested){restartTimer=setTimeout(launch,300);return}stopMicrophone();q('startDictationBtn').classList.remove('hidden');q('startDictationBtn').disabled=false;q('stopDictationBtn').disabled=true;if(finalTranscript){q('populateBtn').disabled=false;q('dictationStatus').className='alert ok';q('dictationStatus').innerHTML='<b>✓ Dictation captured.</b> Review transcript, then press Review & Populate Fields.'}else{q('dictationStatus').className='alert warn';q('dictationStatus').innerHTML='<b>Stopped.</b> No words were captured.'}};
+    try{r.start()}catch(e){activeRecognition=null;if(!stopRequested)restartTimer=setTimeout(launch,500)}};
+  launch();
 }
+function stopDictation(){stopRequested=true;if(restartTimer)clearTimeout(restartTimer);restartTimer=null;q('dictationStatus').className='alert warn';q('dictationStatus').innerHTML='<b>Stopping…</b>';if(activeRecognition){try{activeRecognition.stop()}catch(e){stopMicrophone()}}else stopMicrophone()}
 
-function stopDictation(){
-  stopRequested=true;
-  q('dictationStatus').className='alert warn';
-  q('dictationStatus').innerHTML='<b>Stopping…</b>';
-  if(activeRecognition){try{activeRecognition.stop()}catch(e){}}
-  else stopMicrophone();
+function setv(id,v){if(q(id)&&v!==undefined&&String(v).trim())q(id).value=String(v).trim()}
+function populateFromTranscript(){
+  const t=(q('liveTranscript')?.textContent||'').trim();if(!t||/^(Nothing heard|Listening|Waiting for speech)/i.test(t)){alert('There is no transcript to populate yet.');return}
+  if(activeSection==='biodata')parseBiodata(t);else if(activeSection==='history')parseHistory(t);else if(activeSection==='exam')parseExam(t);else if(activeSection==='plan')parsePlan(t);
+  q('observations').value+=(q('observations').value?' ':'')+t;check();q('dictationStatus').className='alert ok';q('dictationStatus').innerHTML='<b>✓ Fields populated.</b> Review and correct every field before proceeding.';
 }
+function parseBiodata(t){
+  let m=t.match(/(?:patient(?:'s)?\s*)?name\s+(?:is\s+)?(.+?)(?=\s+(?:patient\s*)?id\b|\s+age\b|$)/i);if(m)setv('patientName',m[1]);
+  m=t.match(/(?:patient\s*)?id(?:\s+number|\s+no)?\s*(?:is|:)?\s*([A-Za-z0-9-]+)/i);if(m)setv('patientId',m[1]);
+  m=t.match(/\bage\s+(\d{1,3})\b/i);if(m)setv('age',m[1]);
+  m=t.match(/\b(?:sex|gender)\s+(male|female|man|woman)\b/i);if(m)setv('sex',/female|woman/i.test(m[1])?'Female':'Male');
+  m=t.match(/\boccupation\s+(.+?)(?=\s+phone\b|\s+bp\b|\s+rbs\b|\s+fbs\b|\s+pulse\b|\s+weight\b|$)/i);if(m)setv('occupation',m[1]);
+  m=t.match(/\bphone(?:\s+number)?\s*(?:is|:)?\s*([+\d][\d\s-]{5,})/i);if(m)setv('phone',m[1]);
+  m=t.match(/\bbp\s*(?:is|:)?\s*(\d{2,3}\s*\/\s*\d{2,3})/i);if(m)setv('bp',m[1]);
+  m=t.match(/\b(?:rbs|fbs|blood sugar)\s*(?:is|:)?\s*(\d+(?:\.\d+)?)/i);if(m)setv('sugar',m[1]);
+  m=t.match(/\bpulse\s*(?:is|:)?\s*(\d{2,3})\b/i);if(m)setv('pulse',m[1]);
+  m=t.match(/\bweight\s*(?:is|:)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilograms?)?/i);if(m)setv('weight',m[1]);
+  if(/\bdiabetic|diabetes|dm\b/i.test(t))setv('comorbidity',(q('comorbidity').value?q('comorbidity').value+', ':'')+'Diabetes');
+  if(/\bhypertension|hypertensive|htn\b/i.test(t))setv('comorbidity',(q('comorbidity').value?q('comorbidity').value+', ':'')+'Hypertension');
+  m=t.match(/(?:chief complaint|complains? of|came in with)\s+(.+)$/i);if(m)setv('complaint',m[1]);
+}
+function parseHistory(t){
+  let m=t.match(/\b(right|left|both)\s+eye\b/i);if(m)setv('eye',/right/i.test(m[1])?'Right (RE)':/left/i.test(m[1])?'Left (LE)':'Both (BE)');
+  m=t.match(/\bfor\s+(\d+\s*(?:day|days|week|weeks|month|months|year|years))\b/i);if(m)setv('duration',m[1]);
+  if(/\bno pain\b/i.test(t))setv('pain','No');else if(/\bpain\b/i.test(t))setv('pain','Yes');
+  if(/\bred eye|redness\b/i.test(t))setv('redness','Yes');if(/\bitch(ing)?\b/i.test(t))setv('itching','Yes');if(/\btearing\b/i.test(t))setv('tearing','Yes');
+  if(/\bhalo|halos|glare\b/i.test(t))setv('halos','Yes');if(/\bhazy|foggy|cloudy\b/i.test(t))setv('hazy','Yes');
+  if(/\bworse at night|night vision|especially at night\b/i.test(t))setv('night','Yes');if(/\bbright light|photophobia|glare\b/i.test(t))setv('bright','Yes');
+  if(/\bspectacle|glasses\b/i.test(t))setv('spectacles','Yes');if(/\btrauma|injury|chemical\b/i.test(t))setv('trauma',t.match(/(?:trauma|injury|chemical)[^,.]*/i)?.[0]||'Yes');
+  if(/\bno previous eye surgery\b/i.test(t))setv('surgery','No');else if(/\bprevious eye surgery\b/i.test(t))setv('surgery','Yes');setv('nature',t);
+}
+function parseExam(t){
+  let m=t.match(/\b(?:right|re)\s*(?:eye)?\s*(?:is\s*)?(\d+\s*\/\s*\d+)/i);if(m)setv('vaRE',m[1]);
+  m=t.match(/\b(?:left|le)\s*(?:eye)?\s*(?:is\s*)?(\d+\s*\/\s*\d+)/i);if(m)setv('vaLE',m[1]);
+  m=t.match(/\b(?:bp|blood pressure)\s*(?:is\s*)?(\d{2,3}\s*\/\s*\d{2,3})/i);if(m)setv('bp',m[1]);
+  m=t.match(/\b(?:rbs|fbs|random blood sugar)\s*(?:is\s*)?(\d+(?:\.\d+)?)/i);if(m)setv('sugar',m[1]);
+  m=t.match(/\bpupils?\s+(.+?)(?=,|$)/i);if(m)setv('pupils',m[1]);if(/\bblack\b/i.test(t)&&/\bround\b/i.test(t))setv('pupils','black, round');
+}
+function parsePlan(t){let m=t.match(/\bfor\s+(.+)$/i);if(m)setv('referral',m[1]);setv('sbar',t)}
 
-function clearDictationPreview(){
-  if(q('liveTranscript'))q('liveTranscript').textContent='Nothing heard yet.';
-  if(q('dictationStatus')){q('dictationStatus').className='alert warn';q('dictationStatus').innerHTML='<b>Ready.</b> Press Start Dictation and speak.'}
-}
+function clearDictationPreview(){if(q('liveTranscript'))q('liveTranscript').textContent='Nothing heard yet.';if(q('populateBtn'))q('populateBtn').disabled=true;if(q('dictationStatus')){q('dictationStatus').className='alert warn';q('dictationStatus').innerHTML='<b>Ready.</b> Choose a section and press Start.'}}
+ensureDictationPanel();
 function blob(text,type,name){let b=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function exportJSON(){blob(JSON.stringify(data(),null,2),'application/json','opthacheck-record.json')}
 async function share(){sbar();let d=data(),text=`OphthaCheck record\nNurse: ${d.nurseName} (${d.staffId})\nPatient: ${d.patientName}\nID: ${d.patientId}\nSBAR: ${d.sbar}`;if(navigator.share){try{await navigator.share({title:'OphthaCheck — '+d.patientName,text})}catch(e){}}else alert('Native sharing is unavailable here. Use Print → Save PDF or WhatsApp/Email.')}
