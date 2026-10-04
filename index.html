@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#123f63"><link rel="manifest" href="manifest.webmanifest">
-<title>OphthaCheck v0.5</title>
+<title>OphthaCheck v0.6</title>
 <style>
 :root{--blue:#123f63;--red:#b00020;--green:#147a3d;--amber:#a76400;--bg:#f3f6f8;--line:#cbd6de}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17212b;font-family:Arial,sans-serif}
@@ -12,17 +12,17 @@ h2{font-size:17px;color:var(--blue);margin:0 0 10px}.grid{display:grid;grid-temp
 label{font-size:12px;font-weight:bold;display:block}input,select,textarea{width:100%;padding:9px;border:1px solid #aebbc4;border-radius:6px;font:inherit;background:#fff}textarea{min-height:65px}
 button{border:0;border-radius:7px;padding:8px 11px;margin:2px;background:var(--blue);color:#fff;font-weight:bold;cursor:pointer}.green{background:var(--green)}.red{background:var(--red)}.light{background:#e8eef2;color:var(--blue)}.amber{background:var(--amber)}
 button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.field{min-width:0}.fieldHead{display:flex;align-items:center;gap:4px;margin-bottom:3px}.micSmall{padding:3px 6px;font-size:11px;margin-left:auto}
-.inlineDict{display:none;border-top:1px solid var(--line);margin:6px 0 8px;padding:7px 0 0}.inlineDict.active{display:block}.dictTop{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.dictTop button{white-space:nowrap}.meterInline{flex:1 1 150px;min-width:120px;background:#111;border-radius:5px;padding:2px}.meterInline canvas{display:block;width:100%;height:16px}
+.sectionVoice{display:inline-flex;vertical-align:middle;align-items:center;gap:4px;flex-wrap:wrap;margin-left:8px}.sectionVoice button{white-space:nowrap}.voiceMeterMini{display:none;align-items:center;background:#111;border-radius:5px;padding:2px 4px;min-width:120px;width:180px}.voiceMeterMini.active{display:inline-flex}.voiceMeterMini canvas{display:block;width:100%;height:16px}.voiceTranscript{display:none;margin:6px 0 8px;font-size:12px;background:#f7f9fa;border:1px solid var(--line);border-radius:6px;padding:7px}.voiceTranscript.active{display:block}.voiceStatus{font-size:11px}.inlineDict{display:none}
 .meter{background:#111;border-radius:6px;padding:3px;margin-top:6px}.meter canvas{display:block;width:100%;height:18px}.transcript{font-size:12px;background:#f7f9fa;border:1px solid var(--line);border-radius:6px;padding:7px;margin-top:6px;min-height:32px}
 .status{padding:7px;border-radius:6px;margin:5px 0;font-size:13px}.ok{background:#e5f6eb}.warn{background:#fff2d9}.danger{background:#ffe5e9;border:2px solid var(--red)}
 .muted{font-size:12px;color:#687782}.pill{display:inline-block;background:#e8eef2;color:var(--blue);padding:4px 7px;border-radius:12px;font-size:12px}
 .hidden{display:none!important}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:7px;border-bottom:1px solid var(--line);text-align:left}
 .stickyActions{position:sticky;bottom:0;background:#ffffffee;border-top:1px solid var(--line);padding:7px;z-index:8}
 @media(max-width:720px){.grid{grid-template-columns:1fr 1fr}header{position:relative}.card{padding:11px}}
-@media(max-width:470px){.grid{grid-template-columns:1fr}.meter canvas{height:14px}}
+@media(max-width:470px){.grid{grid-template-columns:1fr}.sectionVoice{display:flex;margin:5px 0 0}.voiceMeterMini{min-width:120px;flex:1}.sectionVoice button{padding:6px 8px}.voiceTranscript{font-size:12px}}
 @media print{header,.no-print,#login,.stickyActions{display:none!important}.card{border:0;box-shadow:none}}
 </style></head><body>
-<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.5.5</small><div id="net" class="net"></div></header>
+<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.6</small><div id="net" class="net"></div></header>
 
 <section id="login" class="card"><h2>Nurse sign-in</h2>
 <p class="muted">Prototype identity: local nurse profile + PIN. Clinical-grade authentication comes later.</p>
@@ -35,10 +35,10 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 
 <div id="emergency" class="status danger hidden"><b>🔴 EMERGENCY — STOP ROUTINE CLERKING</b><div id="emergencyText"></div><b>Call doctor / irrigate immediately according to protocol.</b></div>
 
-<div class="card" id="A"><h2>A. BIODATA & VITALS</h2><div class="inlineDict" id="dict-A"></div><div class="grid">
-<div class="field"><div class="fieldHead"><label>Patient name</label><button class="micSmall light" onclick="fieldDict('patientName','Patient name')">🎙</button></div><input id="patientName"></div>
-<div class="field"><div class="fieldHead"><label>Patient ID / Hospital No.</label><button class="micSmall light" onclick="fieldDict('patientId','Patient ID')">🎙</button></div><input id="patientId"></div>
-<div class="field"><div class="fieldHead"><label>Age</label><button class="micSmall light" onclick="fieldDict('age','Age')">🎙</button></div><input id="age" inputmode="numeric"></div>
+<div class="card" id="A"><h2>A. BIODATA & VITALS <span class="sectionVoice"><button class="light" id="dictBtnA" onclick="sectionDict('A')">🎙 Dictate</button><button class="red" id="stopBtnA" onclick="stopDictation('A')" disabled>■ Stop</button><button class="green" id="populateBtnA" onclick="populateTranscript('A')" disabled>✓ Review & Populate</button><span class="voiceMeterMini" id="meterWrapA"><canvas id="meterCanvasA" width="220" height="18"></canvas></span><span class="pill voiceStatus" id="micStateA">Mic idle</span></span></h2><div class="voiceTranscript" id="transcriptWrapA"><b>Live transcript:</b><div id="transcriptA">Nothing heard yet.</div><div id="populateResultA" class="muted"></div></div><div class="grid">
+<div class="field"><label>Patient name</label><input id="patientName"></div>
+<div class="field"><label>Patient ID / Hospital No.</label><input id="patientId"></div>
+<div class="field"><label>Age</label><input id="age" inputmode="numeric"></div>
 <div class="field"><label>Sex</label><select id="sex"><option></option><option>Male</option><option>Female</option></select></div>
 <div class="field"><label>Occupation</label><input id="occupation"></div><div class="field"><label>Phone</label><input id="phone"></div>
 <div class="field"><label>BP (mmHg)</label><input id="bp" placeholder="e.g. 150/90 mmHg"></div><div class="field"><label>RBS/FBS</label><select id="sugarUnit"><option value="mg/dL">mg/dL</option><option value="mmol/L">mmol/L</option></select><input id="sugar" placeholder="e.g. 200 mg/dL"></div><div class="field"><label>Pulse (BPM)</label><input id="pulse" placeholder="e.g. 72 BPM"></div>
@@ -46,7 +46,7 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 <div class="field"><label>Chief complaint</label><textarea id="complaint"></textarea></div>
 </div>
 
-<div class="card" id="B"><h2>B. HISTORY OF PRESENTING COMPLAINT</h2><div class="inlineDict" id="dict-B"></div><div class="grid">
+<div class="card" id="B"><h2>B. HISTORY OF PRESENTING COMPLAINT <span class="sectionVoice"><button class="light" id="dictBtnB" onclick="sectionDict('B')">🎙 Dictate</button><button class="red" id="stopBtnB" onclick="stopDictation('B')" disabled>■ Stop</button><button class="green" id="populateBtnB" onclick="populateTranscript('B')" disabled>✓ Review & Populate</button><span class="voiceMeterMini" id="meterWrapB"><canvas id="meterCanvasB" width="220" height="18"></canvas></span><span class="pill voiceStatus" id="micStateB">Mic idle</span></span></h2><div class="voiceTranscript" id="transcriptWrapB"><b>Live transcript:</b><div id="transcriptB">Nothing heard yet.</div><div id="populateResultB" class="muted"></div></div><div class="grid">
 <div class="field"><label>Which eye?</label><select id="eye"><option>Not assessed</option><option>Right (RE)</option><option>Left (LE)</option><option>Both (BE)</option></select></div>
 <div class="field"><label>Onset</label><input id="onset"></div><div class="field"><label>Duration</label><input id="duration"></div>
 <div class="field"><label>Nature / main symptom</label><input id="nature"></div><div class="field"><label>Pain</label><select id="pain"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
@@ -60,7 +60,7 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 <div class="field"><label>Cataract family history</label><select id="cataractFamily"><option>Not assessed</option><option>Yes</option><option>No</option></select></div></div>
 </div>
 
-<div class="card" id="C"><h2>C. NURSING EXAMINATION — VA FIRST</h2><div class="inlineDict" id="dict-C"></div><div class="status warn"><b>VA FIRST:</b> Do VA before touching the eye or putting in drops.</div><div class="grid">
+<div class="card" id="C"><h2>C. NURSING EXAMINATION — VA FIRST <span class="sectionVoice"><button class="light" id="dictBtnC" onclick="sectionDict('C')">🎙 Dictate</button><button class="red" id="stopBtnC" onclick="stopDictation('C')" disabled>■ Stop</button><button class="green" id="populateBtnC" onclick="populateTranscript('C')" disabled>✓ Review & Populate</button><span class="voiceMeterMini" id="meterWrapC"><canvas id="meterCanvasC" width="220" height="18"></canvas></span><span class="pill voiceStatus" id="micStateC">Mic idle</span></span></h2><div class="voiceTranscript" id="transcriptWrapC"><b>Live transcript:</b><div id="transcriptC">Nothing heard yet.</div><div id="populateResultC" class="muted"></div></div><div class="status warn"><b>VA FIRST:</b> Do VA before touching the eye or putting in drops.</div><div class="grid">
 <div class="field"><label>VA RE distance</label><input id="vaRE"></div><div class="field"><label>VA LE distance</label><input id="vaLE"></div><div class="field"><label>VA with pinhole/glasses</label><input id="vaPH"></div>
 <div class="field"><label>Near VA</label><input id="nearVA"></div><div class="field"><label>Pupils</label><input id="pupils"></div><div class="field"><label>Lids / conjunctiva</label><input id="external"></div>
 <div class="field"><label>Cornea</label><input id="cornea"></div><div class="field"><label>Discharge</label><input id="examDischarge"></div><div class="field"><label>Simple tests / eye movement</label><input id="simpleTests"></div>
@@ -69,7 +69,7 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 
 <div class="card"><h2>D. RED FLAGS</h2><div id="flags"></div></div>
 
-<div class="card" id="E"><h2>E. NURSING ACTION & PLAN</h2><div class="inlineDict" id="dict-E"></div><div class="grid">
+<div class="card" id="E"><h2>E. NURSING ACTION & PLAN <span class="sectionVoice"><button class="light" id="dictBtnE" onclick="sectionDict('E')">🎙 Dictate</button><button class="red" id="stopBtnE" onclick="stopDictation('E')" disabled>■ Stop</button><button class="green" id="populateBtnE" onclick="populateTranscript('E')" disabled>✓ Review & Populate</button><span class="voiceMeterMini" id="meterWrapE"><canvas id="meterCanvasE" width="220" height="18"></canvas></span><span class="pill voiceStatus" id="micStateE">Mic idle</span></span></h2><div class="voiceTranscript" id="transcriptWrapE"><b>Live transcript:</b><div id="transcriptE">Nothing heard yet.</div><div id="populateResultE" class="muted"></div></div><div class="grid">
 <div><label>Drops instilled / time</label><input id="dropsGiven"></div><div><label>Dilated for doctor / drug</label><input id="dilation"></div><div><label>Investigations</label><input id="investigations"></div>
 <div><label>Referral to</label><input id="referral"></div><div><label>Priority</label><select id="priority"><option>Routine</option><option>Urgent</option><option>Emergency</option></select></div></div>
 <label>SBAR summary</label><textarea id="sbar"></textarea></div>
@@ -84,85 +84,25 @@ const F=['patientName','patientId','age','sex','occupation','phone','bp','sugar'
 const PK='oc5_profiles',SK='oc5_session',AK='oc5_records',DK='oc5_draft';
 const q=id=>document.getElementById(id), profiles=()=>JSON.parse(localStorage.getItem(PK)||'[]'), records=()=>JSON.parse(localStorage.getItem(AK)||'[]');
 let activeRecId=localStorage.getItem(DK)||null, activeRecognition=null, activeSection=null, activeField=null, finalTranscript='', stopRequested=false, restartTimer=null, micStream=null, audioContext=null, analyser=null, meterRAF=null;
-
-function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function session(){return JSON.parse(sessionStorage.getItem(SK)||'null')}
-function login(){
- let name=q('loginName').value.trim(),id=q('loginId').value.trim(),pin=q('loginPin').value.trim();if(!name||!id||!pin)return alert('Enter nurse name, Staff ID and PIN.');
- let p=profiles(),x=p.find(a=>a.id===id);if(x&&x.pin!==pin)return alert('Wrong PIN.');if(!x){x={name,id,pin};p.push(x);localStorage.setItem(PK,JSON.stringify(p))}
- sessionStorage.setItem(SK,JSON.stringify({...x,clockIn:new Date().toISOString()}));startApp();
-}
+function login(){let name=q('loginName').value.trim(),id=q('loginId').value.trim(),pin=q('loginPin').value.trim();if(!name||!id||!pin)return alert('Enter nurse name, Staff ID and PIN.');let p=profiles(),x=p.find(a=>a.id===id);if(x&&x.pin!==pin)return alert('Wrong PIN.');if(!x){x={name,id,pin};p.push(x);localStorage.setItem(PK,JSON.stringify(p))}sessionStorage.setItem(SK,JSON.stringify({...x,clockIn:new Date().toISOString()}));startApp()}
 function startApp(){let s=session();if(!s)return;q('login').classList.add('hidden');q('app').classList.remove('hidden');q('who').textContent=s.name+' ('+s.id+')';q('clock').textContent=new Date(s.clockIn).toLocaleString();renderHistory();restoreDraft();check()}
 function logout(){saveDraft();sessionStorage.removeItem(SK);location.reload()}
 function renderProfiles(){let p=profiles();q('profiles').innerHTML=p.length?p.map((x,i)=>`<button class="light" onclick="existing(${i})">${esc(x.name)} (${esc(x.id)})</button>`).join(''):'<p class="muted">No local profiles yet.</p>'}
 function existing(i){let x=profiles()[i],pin=prompt('PIN for '+x.name);if(pin===x.pin){sessionStorage.setItem(SK,JSON.stringify({...x,clockIn:new Date().toISOString()}));startApp()}else alert('Wrong PIN.')}
-
 function data(){let d={};F.forEach(k=>d[k]=q(k)?.value||'');let s=session();return {...d,nurseName:s?.name||'',staffId:s?.id||'',clockIn:s?.clockIn||'',recordId:activeRecId||String(Date.now())}}
-function saveDraft(silent=false){
- if(!session())return;let d=data();d.updatedAt=new Date().toISOString();activeRecId=d.recordId;localStorage.setItem(DK,activeRecId);
- let all=records().filter(x=>!(x.recordId===d.recordId&&x.staffId===d.staffId));all.unshift({...d,status:'DRAFT'});localStorage.setItem(AK,JSON.stringify(all));
- q('saveState').textContent='Saved '+new Date().toLocaleTimeString();renderHistory();if(!silent)alert('Progress saved on this device.');
-}
-setInterval(()=>saveDraft(true),15000);
-document.addEventListener('input',()=>{q('saveState').textContent='Unsaved changes…'});
-
-function restoreDraft(){
- let s=session(),a=records(),d=activeRecId?a.find(x=>x.recordId===activeRecId&&x.staffId===s.id):a.find(x=>x.staffId===s.id&&x.status==='DRAFT');
- if(d){activeRecId=d.recordId;F.forEach(k=>{if(q(k)&&d[k]!=null)q(k).value=d[k]});normalizeUnits();q('saveState').textContent='Draft restored';}
-}
-function renderHistory(){
- let s=session();if(!s)return;let a=records().filter(x=>x.staffId===s.id);q('history').innerHTML=a.length?'<table><tr><th>Updated</th><th>Patient</th><th>ID</th><th>Status</th><th></th></tr>'+a.map(x=>`<tr><td>${new Date(x.updatedAt||x.savedAt).toLocaleString()}</td><td>${esc(x.patientName)}</td><td>${esc(x.patientId)}</td><td>${esc(x.status||'DRAFT')}</td><td><button class="light" onclick="resume('${x.recordId}')">Open</button></td></tr>`).join('')+'</table>':'<p class="muted">No records yet.</p>'}
+function saveDraft(silent=false){if(!session())return;let d=data();d.updatedAt=new Date().toISOString();activeRecId=d.recordId;localStorage.setItem(DK,activeRecId);let all=records().filter(x=>!(x.recordId===d.recordId&&x.staffId===d.staffId));all.unshift({...d,status:'DRAFT'});localStorage.setItem(AK,JSON.stringify(all));q('saveState').textContent='Saved '+new Date().toLocaleTimeString();renderHistory();if(!silent)alert('Progress saved on this device.')}
+setInterval(()=>saveDraft(true),15000);document.addEventListener('input',()=>{if(q('saveState'))q('saveState').textContent='Unsaved changes…'});
+function restoreDraft(){let s=session(),a=records(),d=activeRecId?a.find(x=>x.recordId===activeRecId&&x.staffId===s.id):a.find(x=>x.staffId===s.id&&x.status==='DRAFT');if(d){activeRecId=d.recordId;F.forEach(k=>{if(q(k)&&d[k]!=null)q(k).value=d[k]});normalizeUnits();q('saveState').textContent='Draft restored'}}
+function renderHistory(){let s=session();if(!s)return;let a=records().filter(x=>x.staffId===s.id);q('history').innerHTML=a.length?'<table><tr><th>Updated</th><th>Patient</th><th>ID</th><th>Status</th><th></th></tr>'+a.map(x=>`<tr><td>${new Date(x.updatedAt||x.savedAt).toLocaleString()}</td><td>${esc(x.patientName)}</td><td>${esc(x.patientId)}</td><td>${esc(x.status||'DRAFT')}</td><td><button class="light" onclick="resume('${x.recordId}')">Open</button></td></tr>`).join('')+'</table>':'<p class="muted">No records yet.</p>'}
 function resume(id){let s=session(),d=records().find(x=>x.recordId===id&&x.staffId===s.id);if(!d)return;activeRecId=id;F.forEach(k=>{if(q(k))q(k).value=d[k]||''});normalizeUnits();q('saveState').textContent='Record restored';window.scrollTo({top:0,behavior:'smooth'});check()}
-
-function showDictHost(section,mode='section',field='',label=''){
- activeSection=section;activeField=field;
- const host=q('dict-'+section);host.classList.add('active');
- host.innerHTML=`<div class="dictTop"><b>🎙 ${mode==='field'?esc(label):'Dictate this section'}</b>
- <button class="green" onclick="startDictation()">🎙 Start</button><button class="red" id="stopBtn" onclick="stopDictation()" disabled>■ Stop</button>
- <button class="green" id="populateBtn" onclick="populateTranscript()" disabled>✓ Review & Populate</button>
- <span id="micState" class="pill">Mic idle</span>
- <div class="meterInline"><canvas id="meterCanvas" width="420" height="18"></canvas></div>
- <span class="muted">Sound <b id="db">—</b></span></div>
- <div class="muted" id="meterHint">Start dictation to monitor the microphone.</div>
- <div class="transcript"><b>Live transcript:</b><div id="transcript">Nothing heard yet.</div></div>
- <div id="populateResult" class="muted"></div>`;
-}
-function fieldDict(field,label){showDictHost('A','field',field,label);startDictation()}
-function sectionDict(section){showDictHost(section,'section');startDictation()}
-
-// Add a section dictate button in each header, immediately next to the section title.
-function installSectionButtons(){
- [['A','Biodata & Vitals'],['B','History'],['C','Nursing Examination'],['E','Nursing Action & Plan']].forEach(([id,label])=>{
-  let h=q(id).querySelector('h2');h.innerHTML+=` <button class="light" style="float:right" onclick="sectionDict('${id}')">🎙 Dictate</button>`;
- });
-}
-async function openMic(){
- if(!navigator.mediaDevices?.getUserMedia)throw new Error('Microphone access unavailable in this browser.');
- micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
- audioContext=new (window.AudioContext||window.webkitAudioContext)();let src=audioContext.createMediaStreamSource(micStream);
- analyser=audioContext.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=.7;src.connect(analyser);drawMeter();
-}
-function drawMeter(){
- const c=q('meterCanvas'),ctx=c.getContext('2d'),a=new Uint8Array(analyser.fftSize);
- const draw=()=>{if(!analyser)return;analyser.getByteTimeDomainData(a);let sum=0;for(let v of a){let n=(v-128)/128;sum+=n*n}
- let db=Math.max(-60,20*Math.log10(Math.max(Math.sqrt(sum/a.length),.00001)));q('db').textContent=db>-59?db.toFixed(0)+' dB':'below -59 dB';q('meterHint').textContent=db<-45?'Very little sound.':db<-25?'Sound detected.':db<-10?'Good speech level.':'Very loud.';
- ctx.clearRect(0,0,c.width,c.height);let bars=44,gap=3,bw=(c.width-gap*(bars-1))/bars,level=Math.max(0,Math.min(1,(db+60)/50));
- for(let i=0;i<bars;i++){let on=level>=((i+1)/bars)*.7,h=4+(c.height-7)*(i+1)/bars;ctx.fillStyle=i<28?'#39d353':i<38?'#f2c94c':'#ff4d4f';ctx.globalAlpha=on?1:.12;ctx.fillRect(i*(bw+gap),c.height-h,bw,h)}ctx.globalAlpha=1;meterRAF=requestAnimationFrame(draw)};draw()
-}
+function sectionDict(section){activeSection=section;activeField=null;const wrap=q('transcriptWrap'+section);wrap.classList.add('active');q('transcript'+section).textContent='Waiting for speech…';q('populateResult'+section).textContent='';q('dictBtn'+section).disabled=true;q('stopBtn'+section).disabled=true;q('populateBtn'+section).disabled=true;startDictation(section)}
+function fieldDict(field,label){activeField=field;activeSection='A';sectionDict('A')}
+function setVoiceState(section,text){q('micState'+section).textContent=text}
+async function openMic(){if(!navigator.mediaDevices?.getUserMedia)throw new Error('Microphone access unavailable in this browser.');micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});audioContext=new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')await audioContext.resume();let src=audioContext.createMediaStreamSource(micStream);analyser=audioContext.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=.7;src.connect(analyser);drawMeter(activeSection)}
+function drawMeter(section){const c=q('meterCanvas'+section),wrap=q('meterWrap'+section),ctx=c.getContext('2d'),a=new Uint8Array(analyser.fftSize);wrap.classList.add('active');const draw=()=>{if(!analyser)return;analyser.getByteTimeDomainData(a);let sum=0;for(let v of a){let n=(v-128)/128;sum+=n*n}let db=Math.max(-60,20*Math.log10(Math.max(Math.sqrt(sum/a.length),.00001)));ctx.clearRect(0,0,c.width,c.height);let bars=40,gap=2,bw=(c.width-gap*(bars-1))/bars,level=Math.max(0,Math.min(1,(db+60)/50));for(let i=0;i<bars;i++){let on=level>=((i+1)/bars)*.72,h=3+(c.height-5)*(i+1)/bars;ctx.fillStyle=i<26?'#39d353':i<34?'#f2c94c':'#ff4d4f';ctx.globalAlpha=on?1:.12;ctx.fillRect(i*(bw+gap),c.height-h,bw,h)}ctx.globalAlpha=1;meterRAF=requestAnimationFrame(draw)};cancelAnimationFrame(meterRAF||0);draw()}
 function stopMic(){if(meterRAF)cancelAnimationFrame(meterRAF);meterRAF=null;if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}if(audioContext){audioContext.close().catch(()=>{});audioContext=null}analyser=null}
-
-async function startDictation(){
- const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert('Speech recognition is unavailable. Use current Chrome/Edge.');return}
- stopRequested=false;finalTranscript='';q('populateBtn').disabled=true;q('stopBtn').disabled=true;q('transcript').textContent='Waiting for speech…';
- try{await openMic();q('micState').textContent='🎤 LIVE'}catch(e){q('micState').textContent='🎤 blocked';alert('Microphone could not be opened: '+e.message);return}
- q('stopBtn').disabled=false;
- const launch=()=>{if(stopRequested)return;let r=new R();activeRecognition=r;r.lang='en-US';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
- r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=(finalTranscript?' ':'')+t;else interim+=(interim?' ':'')+t}q('transcript').textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';q('populateBtn').disabled=!finalTranscript};
- r.onerror=e=>{if(e.error==='no-speech'&&!stopRequested){restartTimer=setTimeout(launch,250);return}q('micState').textContent='⚠ '+e.error};
- r.onend=()=>{activeRecognition=null;if(!stopRequested){restartTimer=setTimeout(launch,250);return}stopMic();q('stopBtn').disabled=true;q('micState').textContent='🎤 stopped';q('populateBtn').disabled=!finalTranscript};
- try{r.start()}catch(e){if(!stopRequested)restartTimer=setTimeout(launch,400)}};launch()
-}
-function stopDictation(){stopRequested=true;if(restartTimer)clearTimeout(restartTimer);restartTimer=null;if(activeRecognition){try{activeRecognition.stop()}catch(e){stopMic()}}else stopMic();q('micState').textContent='🎤 stopping'}
+async function startDictation(section){activeSection=section;const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){setVoiceState(section,'⚠ Speech unavailable');q('dictBtn'+section).disabled=false;return}stopRequested=false;finalTranscript='';q('stopBtn'+section).disabled=true;q('populateBtn'+section).disabled=true;try{await openMic();setVoiceState(section,'🎤 LIVE')}catch(e){setVoiceState(section,'🎤 blocked');alert('Microphone could not be opened: '+e.message);q('dictBtn'+section).disabled=false;return}q('stopBtn'+section).disabled=false;const launch=()=>{if(stopRequested)return;let r=new R();activeRecognition=r;r.lang='en-US';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;r.onstart=()=>setVoiceState(section,'🟢 Listening');r.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){let t=e.results[i][0].transcript;if(e.results[i].isFinal)finalTranscript+=(finalTranscript?' ':'')+t;else interim+=(interim?' ':'')+t}q('transcript'+section).textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';q('populateBtn'+section).disabled=!finalTranscript};r.onerror=e=>{if(e.error==='no-speech'&&!stopRequested){restartTimer=setTimeout(launch,250);return}setVoiceState(section,'⚠ '+e.error)};r.onend=()=>{activeRecognition=null;if(!stopRequested){restartTimer=setTimeout(launch,250);return}stopMic();q('dictBtn'+section).disabled=false;q('stopBtn'+section).disabled=true;q('populateBtn'+section).disabled=!finalTranscript;setVoiceState(section,finalTranscript?'✓ Ready to populate':'No speech captured')};try{r.start()}catch(e){if(!stopRequested)restartTimer=setTimeout(launch,400)}};launch()}
+function stopDictation(section=activeSection){stopRequested=true;if(restartTimer)clearTimeout(restartTimer);restartTimer=null;if(activeRecognition){try{activeRecognition.stop()}catch(e){stopMic()}}else stopMic();if(section)setVoiceState(section,'🎤 stopping')}
 
 function cleanSpokenValue(s){
  return String(s??'').trim()
@@ -185,117 +125,32 @@ function normalizeUnits(){
    if(/^\d+(?:\.\d+)?$/.test(su))q('sugar').value=su+' '+(q('sugarUnit')?.value||'mg/dL');
    else q('sugar').value=su;
  }
- let pu=q('pulse').value.trim()
-   .replace(/\s*(beats?\s*(?:\/|per)\s*min(?:ute)?|bpm|bits?\s+per\s+minute)\s*$/i,'');
- if(pu)q('pulse').value=pu+' BPM';
- let wt=q('weight').value.trim().replace(/\s*(kg|kilograms?)\s*$/i,'');
- if(wt)q('weight').value=wt+' kg';
+ let pu=q('pulse').value.trim().replace(/\s*(?:BPM|beats?\s*(?:\/|per)\s*min(?:ute)?|bits?\s+per\s+minute)\s*$/i,'').trim();
+ if(/^\d{1,3}$/.test(pu))q('pulse').value=pu+' BPM';
+ let wt=q('weight').value.trim().replace(/\s*(kg|kilograms?)\s*$/i,'').trim();
+ if(/^\d+(?:\.\d+)?$/.test(wt))q('weight').value=wt+' kg';
 }
-function populateTranscript(){
- const t=(q('transcript')?.textContent||'').trim();
- if(!t||/^(Nothing heard|Waiting|Listening)/i.test(t)){alert('No transcript to populate.');return}
- let unresolved=[];
- if(activeField)setFieldFromSpeech(activeField,t);
- else if(activeSection==='A')parseA(t,unresolved);
- else if(activeSection==='B')parseB(t,unresolved);
- else if(activeSection==='C')parseC(t,unresolved);
- else if(activeSection==='E')parseE(t,unresolved);
- normalizeUnits();check();saveDraft(true);
- const report=q('populateResult');
- if(report){
-   report.className=unresolved.length?'status warn':'status ok';
-   report.innerHTML=unresolved.length
-     ? '<b>Fields populated, but please review:</b> '+unresolved.map(esc).join(', ')
-     : '<b>✓ Fields populated.</b> Review the values before proceeding.';
- }
- q('micState').textContent=unresolved.length?'⚠ review needed':'✓ fields populated';
-}
-function setFieldFromSpeech(id,t){
- const labels={
-   patientName:'patient(?:\\s+patient)?(?:[\'’]s)?\\s+name',
-   patientId:'patient\\s*(?:id|number|no)',
-   age:'age',
-   complaint:'(?:chief\\s+)?complaint'
- };
- let v='';
- if(id==='age'){
-   v=t.match(/(?:patient\s*)?(?:age|h)\s*(?:is|:)?\s*(\d{1,3})\b/i)?.[1]||t.match(/\b(\d{1,3})\b/)?.[1]||'';
- }else if(id==='patientName'){
-   v=extractLabel(t,labels.patientName,['patient\\s*(?:id|number|no)','age','sex','occupation','phone']);
- }else{
-   v=labels[id]?extractLabel(t,labels[id],['patient\\s*(?:id|number|no)','age','sex','occupation','phone','blood\\s+pressure','bp','rbs','fbs','pulse','weight']):t;
- }
- setv(id,v);
-}
+function normalizeName(s){return cleanSpokenValue(s).replace(/\bpatient\b/ig,'').trim()}
+function between(t,label,next){const re=new RegExp('\\b'+label+'\\s*(?:is|are|was|were|:)?\\s*(.*?)(?=\\s+(?:'+next+')\\s*(?:is|are|was|were|:)?\\b|$)','i');return t.match(re)?.[1]?.trim()||''}
 function parseA(t,unresolved=[]){
  t=t.replace(/\s+/g,' ').trim();
-
- // Name: tolerate "patient name", "patient's name".
- let m=t.match(/\bpatient(?:[’']s)?\s+name\s+(?:is\s+)?(.+?)(?=\s+patient\s*(?:id|number|no)\b|\s+age\b|\s+sex\b|\s+occupation\b|\s+phone\b|\s+blood\s+pressure\b|\s+bp\b|$)/i);
- if(m)setv('patientName',m[1]);
-
- // ID
- m=t.match(/\bpatient\s*(?:id|number|no)\s*(?:is|:)?\s*([A-Za-z0-9-]+)/i);
- if(m)setv('patientId',m[1]);
-
- // Age, including common ASR artifact "patient h48".
- m=t.match(/\b(?:age|patient\s+h)\s*(?:is|:)?\s*(\d{1,3})\b/i);
- if(m)setv('age',m[1]);
-
- let sex=t.match(/\b(?:sex\s+)?(male|female|man|woman)\b/i);
- if(sex)q('sex').value=/female|woman/i.test(sex[1])?'Female':'Male';
-
- // Occupation
- m=t.match(/\boccupation\s+(?:is\s+)?(.+?)(?=\s+phone\b|\s+blood\s+pressure\b|\s+bp\b|\s+(?:rbs|fbs|blood\s+sugar)\b|\s+pulse\b|\s+weight\b|\s+(?:known|diabetic|diabetes)\b|\s+patient\s+complaint\b|$)/i);
- if(m)setv('occupation',m[1]);
-
- // Phone
- m=t.match(/\bphone(?:\s+number)?\s*(?:is|:)?\s*([+\d][\d\s-]{4,})/i);
- if(m)setv('phone',m[1]);
-
- // BP: explicit "over", slash, or spaced numbers. Do not invent a value from a collapsed ambiguous number.
- m=t.match(/\b(?:blood\s+pressure|bp)\s*(?:is|:)?\s*(\d{2,3})\s*(?:over|\/|to)\s*(\d{2,3})\b/i);
- if(m)setv('bp',m[1]+'/'+m[2]);
- else {
-   m=t.match(/\b(?:blood\s+pressure|bp)\s*(?:is|:)?\s*(\d{2,3})\s+(\d{2,3})\b/i);
-   if(m)setv('bp',m[1]+'/'+m[2]);
- }
-
- // RBS/FBS, including "not done".
- m=t.match(/\b(?:(?:rbs|fbs|random\s+(?:blood|blush)\s+sugar|fasting\s+(?:blood|blush)\s+sugar)|blush\s+sugar)\s*(?:is|:)?\s*(not\s+done|not\s+available|nil|\d+(?:\.\d+)?)\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)?/i);
- if(m){
-   setv('sugar',m[1]);
-   if(m[2])q('sugarUnit').value=/mmol/i.test(m[2])?'mmol/L':'mg/dL';
- }
-
- // Pulse: BPM, beats per minute, or ASR "bit per minute".
- m=t.match(/\b(?:pulse|pause)\s*(?:is|:)?\s*(\d{1,3})(?:\s*(?:bpm|beats?\s*(?:per|\/)\s*minute|bits?\s+per\s+minute))?/i);
- if(m)setv('pulse',m[1]);
-
- // Weight in kg.
- m=t.match(/\b(?:weight|wait)\s*(?:is|:)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilograms?)?/i);
- if(m)setv('weight',m[1]);
-
- // Comorbidities.
- let com=[];
- if(/\bnot\s+(?:a\s+)?known\s+(?:diabetic|diabetes|dm)\b/i.test(t))com.push('No known diabetes');
- else if(/\b(?:known\s+)?(?:diabetic|diabetes|dm)\b/i.test(t))com.push('Diabetes');
- if(/\bnot\s+(?:a\s+)?known\s+(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('No known hypertension');
- else if(/\b(?:known\s+)?(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('Hypertension');
- if(com.length)setv('comorbidity',com.join(', '));
-
- // Complaint, including "patient complaint".
- m=t.match(/\b(?:patient\s+)?(?:chief\s+|presenting\s+)?complaint\s+(?:is|:)?\s*(.+?)(?=\s*$)/i);
- if(m)setv('complaint',m[1]);
-
+ const next='patient\\s*(?:id|number|no)|age|sex|occupation|phone(?:\\s+number)?|blood\\s+pressure|bp|rbs|fbs|(?:random|fasting)\\s+(?:blood|blush)\\s+sugar|pulse|pause|weight|wait|known\\s+dm(?:\\s*\\/\\s*htn)?|known\\s+(?:diabetes|hypertension)|patient\\s+complaint|chief\\s+complaint';
+ let v=between(t,"patient(?:[’']s)?\\s+name",next);if(v){v=normalizeName(v);if(/^[A-Za-z][A-Za-z .'-]{1,50}$/.test(v))setv('patientName',v);else unresolved.push('patient name')}else if(/\bpatient(?:[’']s)?\s+name\b/i.test(t))unresolved.push('patient name');
+ let m=t.match(/\bpatient\s*(?:id|number|no)\s*(?:is|:)?\s*([A-Za-z0-9-]+)/i);if(m)setv('patientId',m[1]);else if(/\bpatient\s*(?:id|number|no)\b/i.test(t))unresolved.push('patient ID');
+ m=t.match(/\b(?:age|patient\s+h|h)\s*(?:is|:)?\s*(\d{1,3})\b/i);if(m)setv('age',m[1]);else if(/\bage\b/i.test(t))unresolved.push('age');
+ m=t.match(/\b(?:sex\s+)?(male|female|man|woman)\b/i);if(m)q('sex').value=/female|woman/i.test(m[1])?'Female':'Male';
+ v=between(t,'occupation',next);if(v)setv('occupation',v);else if(/\boccupation\b/i.test(t))unresolved.push('occupation');
+ m=t.match(/\bphone(?:\s+number)?\s*(?:is|:)?\s*([+\d][\d\s-]{4,})/i);if(m){let ph=m[1].trim().split(/\s+(?=(?:blood|bp|rbs|fbs|pulse|pause|weight|wait|known|patient|occupation|age|sex)\b)/i)[0];setv('phone',ph)}else if(/\bphone\b/i.test(t))unresolved.push('phone');
+ let bps=[...t.matchAll(/\b(?:blood\s+pressure|bp)\s*(?:is|:)?\s*(\d{2,3})\s*(?:over|\/|to)\s*(\d{2,3})\b/ig)];if(bps.length)setv('bp',bps[bps.length-1][1]+'/'+bps[bps.length-1][2]);else if(/\b(?:blood\s+pressure|bp)\b/i.test(t))unresolved.push('blood pressure');
+ m=t.match(/\b(?:(?:rbs|fbs)|(?:random|fasting)\s+(?:blood|blush)\s+sugar)\s*(?:is|:)?\s*(not\s+done|not\s+available|nil|\d+(?:\.\d+)?)\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)?/i);if(m){setv('sugar',m[1]);if(m[2])q('sugarUnit').value=/mmol/i.test(m[2])?'mmol/L':'mg/dL'}else if(/\b(?:rbs|fbs|blood\s+sugar|blush\s+sugar)\b/i.test(t))unresolved.push('blood sugar');
+ let pms=[...t.matchAll(/\b(?:pulse|pause)\s*(?:is|:)?\s*(\d{1,3})\s*(?:bpm|beats?\s*(?:per|\/)\s*minute|bits?\s+per\s+minute)\b/ig)];if(pms.length)setv('pulse',pms[pms.length-1][1]);else{m=t.match(/\b(?:pulse|pause)\s*(?:is|:)?\s*(\d{1,3})(?!\s+over\b)/i);if(m)setv('pulse',m[1]);else if(/\b(?:pulse|pause)\b/i.test(t))unresolved.push('pulse')}
+ m=t.match(/\b(?:weight|wait)\s*(?:is|:)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilograms?)?\b/i);if(m)setv('weight',m[1]);else if(/\b(?:weight|wait)\b/i.test(t))unresolved.push('weight');
+ let com=[];if(/\bnot\s+(?:a\s+)?known\s+(?:diabetic|diabetes|dm)\b/i.test(t))com.push('No known diabetes');else if(/\b(?:known\s+)?(?:diabetic|diabetes|dm)\b/i.test(t))com.push('Diabetes');if(/\bnot\s+(?:a\s+)?known\s+(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('No known hypertension');else if(/\b(?:known\s+)?(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('Hypertension');if(com.length)setv('comorbidity',com.join(', '));
+ m=t.match(/\b(?:patient\s+)?(?:chief\s+)?complaint\s*(?:is|:)?\s*(.+)$/i);if(m)setv('complaint',m[1]);
  normalizeUnits();
- const checks=[
-   ['patientName','patient name'],['patientId','patient ID'],['age','age'],['sex','sex'],
-   ['occupation','occupation'],['phone','phone'],['bp','blood pressure'],['sugar','blood sugar'],
-   ['pulse','pulse'],['weight','weight'],['comorbidity','known DM/HTN'],['complaint','chief complaint']
- ];
- checks.forEach(([id,label])=>{if(new RegExp('\\b'+label.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\$&')+'\\b','i').test(t)&&!q(id)?.value)unresolved.push(label)});
 }
+function populateTranscript(section){const t=(q('transcript'+section)?.textContent||'').trim();if(!t||/^(Nothing heard|Waiting|Listening)/i.test(t)){alert('No transcript to populate.');return}let unresolved=[];if(activeField)setFieldFromSpeech(activeField,t);else if(section==='A')parseA(t,unresolved);else if(section==='B')parseB(t,unresolved);else if(section==='C')parseC(t,unresolved);else if(section==='E')parseE(t,unresolved);normalizeUnits();check();saveDraft(true);const report=q('populateResult'+section);report.className=unresolved.length?'status warn':'status ok';report.innerHTML=unresolved.length?'<b>Populated — please review:</b> '+unresolved.map(esc).join(', '):'<b>✓ Fields populated. Review and correct before proceeding.</b>';setVoiceState(section,unresolved.length?'⚠ Review needed':'✓ Fields populated')}
+function setFieldFromSpeech(id,t){if(id==='patientName'){let m=t.match(/\bpatient(?:[’']s)?\s+name\s+(?:is\s+)?(.+?)(?=\s+patient\s*(?:id|number|no)|\s+age\b|\s+sex\b|\s+occupation\b|\s+phone\b|$)/i);if(m)setv(id,normalizeName(m[1]))}else if(id==='patientId'){let m=t.match(/\bpatient\s*(?:id|number|no)\s*(?:is|:)?\s*([A-Za-z0-9-]+)/i);if(m)setv(id,m[1])}else if(id==='age'){let m=t.match(/\b(?:age|patient\s+h|h)\s*(?:is|:)?\s*(\d{1,3})\b/i);if(m)setv(id,m[1])}}
 function parseB(t,unresolved=[]){
  t=t.replace(/\s+/g,' ').trim();
  let m=t.match(/\b(right|left|both)\s+eye\b/i);if(m)q('eye').value=/right/i.test(m[1])?'Right (RE)':/left/i.test(m[1])?'Left (LE)':'Both (BE)';
@@ -348,6 +203,6 @@ async function share(){let d=data();if(navigator.share){try{await navigator.shar
 
 function net(){q('net').textContent=navigator.onLine?'● Online':'● OFFLINE — local saving works';q('net').style.color=navigator.onLine?'#bdf3cc':'#ffe0a3'}
 window.addEventListener('online',net);window.addEventListener('offline',net);
-renderProfiles();net();installSectionButtons();if(session())startApp();
+renderProfiles();net();if(session())startApp();
 </script>
 </body></html>
