@@ -96,6 +96,7 @@ function save(){let d=data();d.savedAt=new Date().toISOString();d.recordId=Date.
 function renderHistory(){let s=S(),a=records().filter(x=>x.staffId===s?.id);q('history').innerHTML=a.length?'<table><tr><th>Date</th><th>Patient</th><th>ID</th><th>Complaint</th><th></th></tr>'+a.map(x=>`<tr><td>${new Date(x.savedAt).toLocaleString()}</td><td>${esc(x.patientName)}</td><td>${esc(x.patientId)}</td><td>${esc(x.complaint)}</td><td><button class="light" onclick="loadRec('${x.recordId}')">Open</button></td></tr>`).join('')+'</table>':'<p class="muted">No saved records.</p>'}
 function loadRec(id){let x=records().find(r=>r.recordId===id);if(!x)return;F.forEach(k=>{if(q(k))q(k).value=x[k]||''});check();scrollTo({top:0,behavior:'smooth'})}
 let activeRecognition=null, activeTarget=null, finalTranscript='', stopRequested=false;
+let micStream=null, audioContext=null, analyser=null, meterRAF=null;
 
 function ensureDictationPanel(){
   let p=q('dictationPanel');
@@ -104,129 +105,177 @@ function ensureDictationPanel(){
     p.id='dictationPanel';
     p.className='card no-print';
     p.innerHTML=`<h2>🎙️ VOICE DICTATION</h2>
-      <div id="dictationStatus" class="alert warn"><b>Ready.</b> Press Start Dictation, then speak naturally.</div>
-      <div style="background:#f7f9fa;border:1px solid #ccd6dd;border-radius:7px;padding:10px;min-height:45px">
-        <b>Live transcript:</b><div id="liveTranscript" class="muted">Nothing heard yet.</div>
-      </div>
-      <div style="margin-top:8px">
+      <div id="dictationStatus" class="alert warn"><b>Ready.</b> Press Start Dictation and speak.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <button class="green" id="startDictationBtn" onclick="startDictation()">🎙 Start Dictation</button>
-        <button class="red hidden" id="stopDictationBtn" onclick="stopDictation()">■ Stop Dictation</button>
-        <button class="light" onclick="clearDictationPreview()">Clear preview</button>
+        <button class="red" id="stopDictationBtn" onclick="stopDictation()" disabled>■ Stop</button>
+        <span id="soundLabel" class="pill">🎤 Microphone: idle</span>
+      </div>
+      <div style="margin-top:10px;background:#111;border-radius:8px;padding:10px">
+        <canvas id="voiceMeter" width="900" height="90" style="width:100%;height:90px;display:block"></canvas>
+      </div>
+      <div class="muted" style="margin-top:5px">Sound level: <b id="dbLabel">—</b> <span id="meterHint">No microphone signal yet.</span></div>
+      <div style="margin-top:9px;background:#f7f9fa;border:1px solid #ccd6dd;border-radius:7px;padding:10px;min-height:45px">
+        <b>Live transcript:</b><div id="liveTranscript" class="muted">Nothing heard yet.</div>
       </div>`;
     q('app').insertBefore(p,q('emergency'));
   }
 }
 
+async function openMicrophone(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    throw new Error('This browser does not expose microphone access. Use current Chrome or Edge over HTTPS.');
+  }
+  micStream=await navigator.mediaDevices.getUserMedia({audio:{
+    echoCancellation:true,noiseSuppression:true,autoGainControl:true
+  }});
+  audioContext=new (window.AudioContext||window.webkitAudioContext)();
+  const source=audioContext.createMediaStreamSource(micStream);
+  analyser=audioContext.createAnalyser();
+  analyser.fftSize=256;
+  analyser.smoothingTimeConstant=.72;
+  source.connect(analyser);
+  startMeter();
+}
+
+function startMeter(){
+  const canvas=q('voiceMeter'),ctx=canvas.getContext('2d'),data=new Uint8Array(analyser.fftSize);
+  const draw=()=>{
+    if(!analyser)return;
+    analyser.getByteTimeDomainData(data);
+    let sum=0;
+    for(const v of data){const n=(v-128)/128;sum+=n*n}
+    const rms=Math.sqrt(sum/data.length);
+    const db=Math.max(-60,20*Math.log10(Math.max(rms,.00001)));
+    q('dbLabel').textContent=(db>-59?db.toFixed(0)+' dB':'below -59 dB');
+    q('meterHint').textContent=db<-45?'Microphone is open, but very little sound is reaching it.':db<-25?'Sound detected — speak normally.':db<-10?'Good speech level.':'Very loud — move the microphone slightly away.';
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const bars=36,gap=5,bw=(W-gap*(bars-1))/bars;
+    const level=Math.max(0,Math.min(1,(db+60)/50));
+    for(let i=0;i<bars;i++){
+      const x=i*(bw+gap);
+      const threshold=(i+1)/bars;
+      let on=level>=threshold*.72;
+      const h=10+Math.max(0,H-22)*(i+1)/bars;
+      ctx.fillStyle= i<bars*.65 ? '#39d353' : i<bars*.86 ? '#f2c94c' : '#ff4d4f';
+      ctx.globalAlpha=on?1:.16;
+      ctx.fillRect(x,H-h,bw,h);
+    }
+    ctx.globalAlpha=1;
+    meterRAF=requestAnimationFrame(draw);
+  };
+  cancelAnimationFrame(meterRAF||0); draw();
+}
+
+function stopMicrophone(){
+  if(meterRAF)cancelAnimationFrame(meterRAF);
+  meterRAF=null;
+  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}
+  if(audioContext){audioContext.close().catch(()=>{});audioContext=null}
+  analyser=null;
+  if(q('soundLabel'))q('soundLabel').textContent='🎤 Microphone: stopped';
+}
+
 function dictate(id){
   ensureDictationPanel();
   activeTarget=id;
-  if(activeRecognition){ stopDictation(); return; }
+  if(activeRecognition){stopDictation();return}
   startDictation();
 }
 
-function startDictation(){
+async function startDictation(){
   ensureDictationPanel();
   const R=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!R){
     q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Speech recognition is unavailable in this browser.</b> Try current Chrome or Edge, and make sure the site is using HTTPS.';
+    q('dictationStatus').innerHTML='<b>Speech recognition is unavailable in this browser.</b> Try current Chrome or Edge.';
     return;
   }
-  if(!activeTarget) activeTarget='observations';
+  if(!activeTarget)activeTarget='observations';
+  stopRequested=false;finalTranscript='';
+  q('liveTranscript').textContent='Waiting for speech…';
+  q('startDictationBtn').disabled=true;q('stopDictationBtn').disabled=true;
 
-  stopRequested=false;
-  finalTranscript='';
-  q('liveTranscript').textContent='Listening… speak now.';
+  try{
+    await openMicrophone();
+    q('soundLabel').textContent='🎤 Microphone: LIVE';
+  }catch(e){
+    q('dictationStatus').className='alert danger';
+    q('dictationStatus').innerHTML='<b>Microphone could not be opened.</b> '+esc(e.message)+'<br><small>Check the microphone permission in the address bar, then reload this page.</small>';
+    q('startDictationBtn').disabled=false;
+    return;
+  }
+
   q('dictationStatus').className='alert ok';
-  q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — OphthaCheck is listening. Speak now. Press Stop Dictation when finished.';
+  q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — speak now. You should see the green/yellow/red sound bars moving.';
   q('startDictationBtn').classList.add('hidden');
+  q('stopDictationBtn').disabled=false;
   q('stopDictationBtn').classList.remove('hidden');
 
-  const r=new R();
-  activeRecognition=r;
-  r.lang='en-US';
-  r.continuous=true;
-  r.interimResults=true;
-  r.maxAlternatives=1;
-
+  const r=new R();activeRecognition=r;
+  r.lang='en-US';r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
   r.onstart=()=>{
     q('dictationStatus').className='alert ok';
-    q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — Speak now. Press Stop Dictation when finished.';
+    q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — microphone live. Speak now.';
   };
-
-  r.onresult=(event)=>{
+  r.onresult=e=>{
     let interim='';
-    for(let i=event.resultIndex;i<event.results.length;i++){
-      const text=event.results[i][0].transcript;
-      if(event.results[i].isFinal) finalTranscript+=(finalTranscript?' ':'')+text;
-      else interim+=(interim?' ':'')+text;
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal)finalTranscript+=(finalTranscript?' ':'')+t;
+      else interim+=(interim?' ':'')+t;
     }
     q('liveTranscript').textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';
   };
-
-  r.onerror=(event)=>{
+  r.onerror=e=>{
     const friendly={
-      'not-allowed':'Microphone permission was denied. Click the lock/microphone icon beside the address bar and allow microphone access, then try again.',
-      'service-not-allowed':'The browser speech-recognition service is unavailable. Try Chrome/Edge while online.',
-      'no-speech':'No speech was detected. Press Start and speak clearly.',
-      'audio-capture':'No microphone was available. Check the computer microphone.',
+      'not-allowed':'Microphone permission was denied. Allow microphone access for this site and reload.',
+      'service-not-allowed':'The browser speech-recognition service is unavailable.',
+      'no-speech':'No speech was detected. The microphone meter should still move if sound is reaching the browser.',
+      'audio-capture':'No microphone was available.',
       'network':'The browser speech-recognition service needs network access.',
       'aborted':'Dictation was stopped.'
     };
     q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Dictation error:</b> '+esc(friendly[event.error]||event.error);
+    q('dictationStatus').innerHTML='<b>Speech recognition:</b> '+esc(friendly[e.error]||e.error);
   };
-
   r.onend=()=>{
-    activeRecognition=null;
-    q('startDictationBtn').classList.remove('hidden');
-    q('stopDictationBtn').classList.add('hidden');
-
+    activeRecognition=null;stopMicrophone();
+    q('startDictationBtn').classList.remove('hidden');q('startDictationBtn').disabled=false;
+    q('stopDictationBtn').disabled=true;
     if(finalTranscript.trim()){
       const target=q(activeTarget);
-      if(target){
-        target.value+=(target.value?' ':'')+finalTranscript.trim();
-      }
+      if(target)target.value+=(target.value?' ':'')+finalTranscript.trim();
       q('dictationStatus').className='alert ok';
-      q('dictationStatus').innerHTML='<b>✓ Dictation captured.</b> The text has been placed in the selected field. You can edit it before checking.';
+      q('dictationStatus').innerHTML='<b>✓ Dictation captured.</b> Review it before checking.';
       check();
-    }else if(!stopRequested){
+    }else if(stopRequested){
       q('dictationStatus').className='alert warn';
-      q('dictationStatus').innerHTML='<b>No speech captured.</b> Press Start Dictation and speak clearly.';
-    }else{
-      q('dictationStatus').className='alert warn';
-      q('dictationStatus').innerHTML='<b>Dictation stopped.</b> No final words were captured.';
+      q('dictationStatus').innerHTML='<b>Dictation stopped.</b> No words were captured by speech recognition.';
     }
   };
-
-  try{r.start()}
-  catch(e){
-    activeRecognition=null;
-    q('startDictationBtn').classList.remove('hidden');
-    q('stopDictationBtn').classList.add('hidden');
+  try{r.start()}catch(e){
+    activeRecognition=null;stopMicrophone();
+    q('startDictationBtn').classList.remove('hidden');q('startDictationBtn').disabled=false;
+    q('stopDictationBtn').disabled=true;
     q('dictationStatus').className='alert danger';
-    q('dictationStatus').innerHTML='<b>Could not start microphone:</b> '+esc(e.message);
+    q('dictationStatus').innerHTML='<b>Could not start speech recognition:</b> '+esc(e.message);
   }
 }
 
 function stopDictation(){
   stopRequested=true;
-  if(activeRecognition){
-    q('dictationStatus').className='alert warn';
-    q('dictationStatus').innerHTML='<b>Stopping…</b> Finishing the current speech recognition result.';
-    try{activeRecognition.stop()}catch(e){}
-  }
+  q('dictationStatus').className='alert warn';
+  q('dictationStatus').innerHTML='<b>Stopping…</b>';
+  if(activeRecognition){try{activeRecognition.stop()}catch(e){}}
+  else stopMicrophone();
 }
 
 function clearDictationPreview(){
-  if(q('liveTranscript')) q('liveTranscript').textContent='Nothing heard yet.';
-  if(q('dictationStatus')){
-    q('dictationStatus').className='alert warn';
-    q('dictationStatus').innerHTML='<b>Ready.</b> Press Start Dictation, then speak naturally.';
-  }
+  if(q('liveTranscript'))q('liveTranscript').textContent='Nothing heard yet.';
+  if(q('dictationStatus')){q('dictationStatus').className='alert warn';q('dictationStatus').innerHTML='<b>Ready.</b> Press Start Dictation and speak.'}
 }
-
-ensureDictationPanel();
 function blob(text,type,name){let b=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function exportJSON(){blob(JSON.stringify(data(),null,2),'application/json','opthacheck-record.json')}
 async function share(){sbar();let d=data(),text=`OphthaCheck record\nNurse: ${d.nurseName} (${d.staffId})\nPatient: ${d.patientName}\nID: ${d.patientId}\nSBAR: ${d.sbar}`;if(navigator.share){try{await navigator.share({title:'OphthaCheck — '+d.patientName,text})}catch(e){}}else alert('Native sharing is unavailable here. Use Print → Save PDF or WhatsApp/Email.')}
