@@ -12,17 +12,17 @@ h2{font-size:17px;color:var(--blue);margin:0 0 10px}.grid{display:grid;grid-temp
 label{font-size:12px;font-weight:bold;display:block}input,select,textarea{width:100%;padding:9px;border:1px solid #aebbc4;border-radius:6px;font:inherit;background:#fff}textarea{min-height:65px}
 button{border:0;border-radius:7px;padding:8px 11px;margin:2px;background:var(--blue);color:#fff;font-weight:bold;cursor:pointer}.green{background:var(--green)}.red{background:var(--red)}.light{background:#e8eef2;color:var(--blue)}.amber{background:var(--amber)}
 button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.field{min-width:0}.fieldHead{display:flex;align-items:center;gap:4px;margin-bottom:3px}.micSmall{padding:3px 6px;font-size:11px;margin-left:auto}
-.inlineDict{display:none;border-top:1px solid var(--line);margin-top:8px;padding-top:8px}.inlineDict.active{display:block}.dictTop{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.meter{background:#111;border-radius:6px;padding:3px;margin-top:6px}.meter canvas{display:block;width:100%;height:28px}.transcript{font-size:12px;background:#f7f9fa;border:1px solid var(--line);border-radius:6px;padding:7px;margin-top:6px;min-height:32px}
+.inlineDict{display:none;border-top:1px solid var(--line);margin:6px 0 8px;padding:7px 0 0}.inlineDict.active{display:block}.dictTop{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.dictTop button{white-space:nowrap}.meterInline{flex:1 1 150px;min-width:120px;background:#111;border-radius:5px;padding:2px}.meterInline canvas{display:block;width:100%;height:16px}
+.meter{background:#111;border-radius:6px;padding:3px;margin-top:6px}.meter canvas{display:block;width:100%;height:18px}.transcript{font-size:12px;background:#f7f9fa;border:1px solid var(--line);border-radius:6px;padding:7px;margin-top:6px;min-height:32px}
 .status{padding:7px;border-radius:6px;margin:5px 0;font-size:13px}.ok{background:#e5f6eb}.warn{background:#fff2d9}.danger{background:#ffe5e9;border:2px solid var(--red)}
 .muted{font-size:12px;color:#687782}.pill{display:inline-block;background:#e8eef2;color:var(--blue);padding:4px 7px;border-radius:12px;font-size:12px}
 .hidden{display:none!important}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:7px;border-bottom:1px solid var(--line);text-align:left}
 .stickyActions{position:sticky;bottom:0;background:#ffffffee;border-top:1px solid var(--line);padding:7px;z-index:8}
 @media(max-width:720px){.grid{grid-template-columns:1fr 1fr}header{position:relative}.card{padding:11px}}
-@media(max-width:470px){.grid{grid-template-columns:1fr}.meter canvas{height:22px}}
+@media(max-width:470px){.grid{grid-template-columns:1fr}.meter canvas{height:14px}}
 @media print{header,.no-print,#login,.stickyActions{display:none!important}.card{border:0;box-shadow:none}}
 </style></head><body>
-<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.5.2</small><div id="net" class="net"></div></header>
+<header><h1>OPHTHACHECK</h1><small>Ophthalmic Nursing Clerking & Completeness Assistant — v0.5.5</small><div id="net" class="net"></div></header>
 
 <section id="login" class="card"><h2>Nurse sign-in</h2>
 <p class="muted">Prototype identity: local nurse profile + PIN. Clinical-grade authentication comes later.</p>
@@ -35,7 +35,7 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 
 <div id="emergency" class="status danger hidden"><b>🔴 EMERGENCY — STOP ROUTINE CLERKING</b><div id="emergencyText"></div><b>Call doctor / irrigate immediately according to protocol.</b></div>
 
-<div class="card" id="A"><h2>A. BIODATA & VITALS</h2><div class="grid">
+<div class="card" id="A"><h2>A. BIODATA & VITALS</h2><div class="inlineDict" id="dict-A"></div><div class="grid">
 <div class="field"><div class="fieldHead"><label>Patient name</label><button class="micSmall light" onclick="fieldDict('patientName','Patient name')">🎙</button></div><input id="patientName"></div>
 <div class="field"><div class="fieldHead"><label>Patient ID / Hospital No.</label><button class="micSmall light" onclick="fieldDict('patientId','Patient ID')">🎙</button></div><input id="patientId"></div>
 <div class="field"><div class="fieldHead"><label>Age</label><button class="micSmall light" onclick="fieldDict('age','Age')">🎙</button></div><input id="age" inputmode="numeric"></div>
@@ -44,9 +44,9 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 <div class="field"><label>BP (mmHg)</label><input id="bp" placeholder="e.g. 150/90 mmHg"></div><div class="field"><label>RBS/FBS</label><select id="sugarUnit"><option value="mg/dL">mg/dL</option><option value="mmol/L">mmol/L</option></select><input id="sugar" placeholder="e.g. 200 mg/dL"></div><div class="field"><label>Pulse (BPM)</label><input id="pulse" placeholder="e.g. 72 BPM"></div>
 <div class="field"><label>Weight (kg)</label><input id="weight" placeholder="e.g. 70 kg"></div><div class="field"><label>Known DM/HTN</label><input id="comorbidity"></div></div>
 <div class="field"><label>Chief complaint</label><textarea id="complaint"></textarea></div>
-<div class="inlineDict" id="dict-A"></div></div>
+</div>
 
-<div class="card" id="B"><h2>B. HISTORY OF PRESENTING COMPLAINT</h2><div class="grid">
+<div class="card" id="B"><h2>B. HISTORY OF PRESENTING COMPLAINT</h2><div class="inlineDict" id="dict-B"></div><div class="grid">
 <div class="field"><label>Which eye?</label><select id="eye"><option>Not assessed</option><option>Right (RE)</option><option>Left (LE)</option><option>Both (BE)</option></select></div>
 <div class="field"><label>Onset</label><input id="onset"></div><div class="field"><label>Duration</label><input id="duration"></div>
 <div class="field"><label>Nature / main symptom</label><input id="nature"></div><div class="field"><label>Pain</label><select id="pain"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
@@ -58,21 +58,21 @@ button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:6px;align-i
 <div class="field"><label>Spectacle / contact lens use</label><input id="spectacles"></div><div class="field"><label>Cloudy / hazy vision</label><select id="hazy"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
 <div class="field"><label>Worse at night</label><select id="night"><option>Not assessed</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Bright-light difficulty</label><select id="bright"><option>Not assessed</option><option>Yes</option><option>No</option></select></div>
 <div class="field"><label>Cataract family history</label><select id="cataractFamily"><option>Not assessed</option><option>Yes</option><option>No</option></select></div></div>
-<div class="inlineDict" id="dict-B"></div></div>
+</div>
 
-<div class="card" id="C"><h2>C. NURSING EXAMINATION — VA FIRST</h2><div class="status warn"><b>VA FIRST:</b> Do VA before touching the eye or putting in drops.</div><div class="grid">
+<div class="card" id="C"><h2>C. NURSING EXAMINATION — VA FIRST</h2><div class="inlineDict" id="dict-C"></div><div class="status warn"><b>VA FIRST:</b> Do VA before touching the eye or putting in drops.</div><div class="grid">
 <div class="field"><label>VA RE distance</label><input id="vaRE"></div><div class="field"><label>VA LE distance</label><input id="vaLE"></div><div class="field"><label>VA with pinhole/glasses</label><input id="vaPH"></div>
 <div class="field"><label>Near VA</label><input id="nearVA"></div><div class="field"><label>Pupils</label><input id="pupils"></div><div class="field"><label>Lids / conjunctiva</label><input id="external"></div>
 <div class="field"><label>Cornea</label><input id="cornea"></div><div class="field"><label>Discharge</label><input id="examDischarge"></div><div class="field"><label>Simple tests / eye movement</label><input id="simpleTests"></div>
 <div class="field"><label>IOP RE</label><input id="iopRE"></div><div class="field"><label>IOP LE</label><input id="iopLE"></div></div>
-<div class="inlineDict" id="dict-C"></div></div>
+</div>
 
 <div class="card"><h2>D. RED FLAGS</h2><div id="flags"></div></div>
 
-<div class="card" id="E"><h2>E. NURSING ACTION & PLAN</h2><div class="grid">
+<div class="card" id="E"><h2>E. NURSING ACTION & PLAN</h2><div class="inlineDict" id="dict-E"></div><div class="grid">
 <div><label>Drops instilled / time</label><input id="dropsGiven"></div><div><label>Dilated for doctor / drug</label><input id="dilation"></div><div><label>Investigations</label><input id="investigations"></div>
 <div><label>Referral to</label><input id="referral"></div><div><label>Priority</label><select id="priority"><option>Routine</option><option>Urgent</option><option>Emergency</option></select></div></div>
-<label>SBAR summary</label><textarea id="sbar"></textarea><div class="inlineDict" id="dict-E"></div></div>
+<label>SBAR summary</label><textarea id="sbar"></textarea></div>
 
 <div class="stickyActions no-print"><div class="row"><button class="green" onclick="saveDraft()">💾 Save Progress</button><button onclick="check()">✓ Check</button><button onclick="makeSBAR()">Generate SBAR</button><button onclick="finalizeRecord()">✓ Finalize & Archive</button><button onclick="window.print()">🖨 PDF</button><button onclick="share()">📤 Share</button></div></div>
 
@@ -120,10 +120,12 @@ function showDictHost(section,mode='section',field='',label=''){
  host.innerHTML=`<div class="dictTop"><b>🎙 ${mode==='field'?esc(label):'Dictate this section'}</b>
  <button class="green" onclick="startDictation()">🎙 Start</button><button class="red" id="stopBtn" onclick="stopDictation()" disabled>■ Stop</button>
  <button class="green" id="populateBtn" onclick="populateTranscript()" disabled>✓ Review & Populate</button>
- <span id="micState" class="pill">Mic idle</span></div>
- <div class="meter"><canvas id="meterCanvas" width="900" height="42"></canvas></div>
- <div class="muted">Sound <b id="db">—</b> · <span id="meterHint">Start dictation to monitor the microphone.</span></div>
- <div class="transcript"><b>Live transcript:</b><div id="transcript">Nothing heard yet.</div></div>`;
+ <span id="micState" class="pill">Mic idle</span>
+ <div class="meterInline"><canvas id="meterCanvas" width="420" height="18"></canvas></div>
+ <span class="muted">Sound <b id="db">—</b></span></div>
+ <div class="muted" id="meterHint">Start dictation to monitor the microphone.</div>
+ <div class="transcript"><b>Live transcript:</b><div id="transcript">Nothing heard yet.</div></div>
+ <div id="populateResult" class="muted"></div>`;
 }
 function fieldDict(field,label){showDictHost('A','field',field,label);startDictation()}
 function sectionDict(section){showDictHost(section,'section');startDictation()}
@@ -162,63 +164,172 @@ async function startDictation(){
 }
 function stopDictation(){stopRequested=true;if(restartTimer)clearTimeout(restartTimer);restartTimer=null;if(activeRecognition){try{activeRecognition.stop()}catch(e){stopMic()}}else stopMic();q('micState').textContent='🎤 stopping'}
 
-function cleanSpokenValue(s){return s.trim().replace(/^(is|are|was|were|of|the)\s+/i,'').trim().replace(/[.,;]+$/,'').trim()}
-function segment(text,labelPatterns){
- let labels=labelPatterns.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
- return text.match(new RegExp('(?:'+labels+')\\s*(?:is|are|was|were|:)?\\s*(.*?)(?=\\s+(?:'+labels+')\\s*(?:is|are|was|were|:)?|$)','i'))?.[1]||''
+function cleanSpokenValue(s){
+ return String(s??'').trim()
+ .replace(/^(?:is|are|was|were|of|the)\s+/i,'')
+ .replace(/[.,;]+$/,'').trim();
 }
-function setv(id,v){if(q(id)&&v!==undefined&&String(v).trim())q(id).value=cleanSpokenValue(v)}
-function populateTranscript(){
- let t=q('transcript').textContent.trim();if(!t||/^(Nothing heard|Waiting|Listening)/i.test(t)){alert('No transcript to populate.');return}
- if(activeField){setFieldFromSpeech(activeField,t)}else if(activeSection==='A')parseA(t);else if(activeSection==='B')parseB(t);else if(activeSection==='C')parseC(t);else if(activeSection==='E')parseE(t);
- check();saveDraft(true);q('micState').textContent='✓ fields populated'
+function extractLabel(t,label,nextLabels){
+ const next=nextLabels.join('|');
+ const re=new RegExp(label+'\\s*(?:is|are|was|were|:)?\\s*(.*?)(?=\\s+(?:'+next+')\\s*(?:is|are|was|were|:)?\\b|$)','i');
+ return t.match(re)?.[1]?.trim()||'';
 }
-function setFieldFromSpeech(id,t){
- let label={patientName:"patient(?:'s)?\\s+name",patientId:"patient\\s*(?:id|number)",age:"age",complaint:"chief\\s+complaint"}[id];
- let v=label?segment(t,[label]):t;
- if(id==='age'){let m=t.match(/\b(\d{1,3})\b/);v=m?m[1]:t}
- if(id==='patientName')v=v.replace(/^(?:is|:)\s*/i,'').replace(/\b(patient'?s?\s+name)\b/i,'').trim();
- setv(id,v)
+function setv(id,v){
+ if(q(id)&&v!==undefined&&v!==null&&String(v).trim())q(id).value=cleanSpokenValue(v);
 }
 function normalizeUnits(){
-  let bp=q('bp').value.trim().replace(/\s*mmHg\s*$/i,'');
-  if(bp) q('bp').value=bp+' mmHg';
-  let su=q('sugar').value.trim().replace(/\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)\s*$/i,'');
-  if(su) q('sugar').value=su+' '+(q('sugarUnit')?.value||'mg/dL');
-  let pu=q('pulse').value.trim().replace(/\s*(beats?\s*\/\s*min|bpm)\s*$/i,'');
-  if(pu) q('pulse').value=pu+' BPM';
-  let wt=q('weight').value.trim().replace(/\s*(kg|kilograms?)\s*$/i,'');
-  if(wt) q('weight').value=wt+' kg';
+ let bp=q('bp').value.trim().replace(/\s*mmHg\s*$/i,'');
+ if(bp)q('bp').value=bp+' mmHg';
+ let su=q('sugar').value.trim().replace(/\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)\s*$/i,'');
+ if(su){
+   if(/^\d+(?:\.\d+)?$/.test(su))q('sugar').value=su+' '+(q('sugarUnit')?.value||'mg/dL');
+   else q('sugar').value=su;
+ }
+ let pu=q('pulse').value.trim()
+   .replace(/\s*(beats?\s*(?:\/|per)\s*min(?:ute)?|bpm|bits?\s+per\s+minute)\s*$/i,'');
+ if(pu)q('pulse').value=pu+' BPM';
+ let wt=q('weight').value.trim().replace(/\s*(kg|kilograms?)\s*$/i,'');
+ if(wt)q('weight').value=wt+' kg';
 }
-function parseA(t){
- const specs=[
-  ['patientName',["patient(?:\\'s)?\\s+name"]],['patientId',['patient\\s*(?:id|number|no)']],['age',['age']],['occupation',['occupation']],
-  ['phone',['phone(?:\\s+number)?']],['bp',['(?:blood\\s+pressure|bp)']],['sugar',['(?:rbs|fbs|random\\s+blood\\s+sugar|fasting\\s+blood\\s+sugar)']],
-  ['pulse',['pulse']],['weight',['weight']],['comorbidity',['known\\s+(?:dm|htn|diabetes|hypertension)|diabetic|diabetes|hypertensive|hypertension']],['complaint',['chief\\s+complaint|complains?\\s+of|presenting\\s+complaint']]
+function populateTranscript(){
+ const t=(q('transcript')?.textContent||'').trim();
+ if(!t||/^(Nothing heard|Waiting|Listening)/i.test(t)){alert('No transcript to populate.');return}
+ let unresolved=[];
+ if(activeField)setFieldFromSpeech(activeField,t);
+ else if(activeSection==='A')parseA(t,unresolved);
+ else if(activeSection==='B')parseB(t,unresolved);
+ else if(activeSection==='C')parseC(t,unresolved);
+ else if(activeSection==='E')parseE(t,unresolved);
+ normalizeUnits();check();saveDraft(true);
+ const report=q('populateResult');
+ if(report){
+   report.className=unresolved.length?'status warn':'status ok';
+   report.innerHTML=unresolved.length
+     ? '<b>Fields populated, but please review:</b> '+unresolved.map(esc).join(', ')
+     : '<b>✓ Fields populated.</b> Review the values before proceeding.';
+ }
+ q('micState').textContent=unresolved.length?'⚠ review needed':'✓ fields populated';
+}
+function setFieldFromSpeech(id,t){
+ const labels={
+   patientName:'patient(?:\\s+patient)?(?:[\'’]s)?\\s+name',
+   patientId:'patient\\s*(?:id|number|no)',
+   age:'age',
+   complaint:'(?:chief\\s+)?complaint'
+ };
+ let v='';
+ if(id==='age'){
+   v=t.match(/(?:patient\s*)?(?:age|h)\s*(?:is|:)?\s*(\d{1,3})\b/i)?.[1]||t.match(/\b(\d{1,3})\b/)?.[1]||'';
+ }else if(id==='patientName'){
+   v=extractLabel(t,labels.patientName,['patient\\s*(?:id|number|no)','age','sex','occupation','phone']);
+ }else{
+   v=labels[id]?extractLabel(t,labels[id],['patient\\s*(?:id|number|no)','age','sex','occupation','phone','blood\\s+pressure','bp','rbs','fbs','pulse','weight']):t;
+ }
+ setv(id,v);
+}
+function parseA(t,unresolved=[]){
+ t=t.replace(/\s+/g,' ').trim();
+
+ // Name: tolerate "patient name", "patient's name".
+ let m=t.match(/\bpatient(?:[’']s)?\s+name\s+(?:is\s+)?(.+?)(?=\s+patient\s*(?:id|number|no)\b|\s+age\b|\s+sex\b|\s+occupation\b|\s+phone\b|\s+blood\s+pressure\b|\s+bp\b|$)/i);
+ if(m)setv('patientName',m[1]);
+
+ // ID
+ m=t.match(/\bpatient\s*(?:id|number|no)\s*(?:is|:)?\s*([A-Za-z0-9-]+)/i);
+ if(m)setv('patientId',m[1]);
+
+ // Age, including common ASR artifact "patient h48".
+ m=t.match(/\b(?:age|patient\s+h)\s*(?:is|:)?\s*(\d{1,3})\b/i);
+ if(m)setv('age',m[1]);
+
+ let sex=t.match(/\b(?:sex\s+)?(male|female|man|woman)\b/i);
+ if(sex)q('sex').value=/female|woman/i.test(sex[1])?'Female':'Male';
+
+ // Occupation
+ m=t.match(/\boccupation\s+(?:is\s+)?(.+?)(?=\s+phone\b|\s+blood\s+pressure\b|\s+bp\b|\s+(?:rbs|fbs|blood\s+sugar)\b|\s+pulse\b|\s+weight\b|\s+(?:known|diabetic|diabetes)\b|\s+patient\s+complaint\b|$)/i);
+ if(m)setv('occupation',m[1]);
+
+ // Phone
+ m=t.match(/\bphone(?:\s+number)?\s*(?:is|:)?\s*([+\d][\d\s-]{4,})/i);
+ if(m)setv('phone',m[1]);
+
+ // BP: explicit "over", slash, or spaced numbers. Do not invent a value from a collapsed ambiguous number.
+ m=t.match(/\b(?:blood\s+pressure|bp)\s*(?:is|:)?\s*(\d{2,3})\s*(?:over|\/|to)\s*(\d{2,3})\b/i);
+ if(m)setv('bp',m[1]+'/'+m[2]);
+ else {
+   m=t.match(/\b(?:blood\s+pressure|bp)\s*(?:is|:)?\s*(\d{2,3})\s+(\d{2,3})\b/i);
+   if(m)setv('bp',m[1]+'/'+m[2]);
+ }
+
+ // RBS/FBS, including "not done".
+ m=t.match(/\b(?:(?:rbs|fbs|random\s+(?:blood|blush)\s+sugar|fasting\s+(?:blood|blush)\s+sugar)|blush\s+sugar)\s*(?:is|:)?\s*(not\s+done|not\s+available|nil|\d+(?:\.\d+)?)\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)?/i);
+ if(m){
+   setv('sugar',m[1]);
+   if(m[2])q('sugarUnit').value=/mmol/i.test(m[2])?'mmol/L':'mg/dL';
+ }
+
+ // Pulse: BPM, beats per minute, or ASR "bit per minute".
+ m=t.match(/\b(?:pulse|pause)\s*(?:is|:)?\s*(\d{1,3})(?:\s*(?:bpm|beats?\s*(?:per|\/)\s*minute|bits?\s+per\s+minute))?/i);
+ if(m)setv('pulse',m[1]);
+
+ // Weight in kg.
+ m=t.match(/\b(?:weight|wait)\s*(?:is|:)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilograms?)?/i);
+ if(m)setv('weight',m[1]);
+
+ // Comorbidities.
+ let com=[];
+ if(/\bnot\s+(?:a\s+)?known\s+(?:diabetic|diabetes|dm)\b/i.test(t))com.push('No known diabetes');
+ else if(/\b(?:known\s+)?(?:diabetic|diabetes|dm)\b/i.test(t))com.push('Diabetes');
+ if(/\bnot\s+(?:a\s+)?known\s+(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('No known hypertension');
+ else if(/\b(?:known\s+)?(?:hypertension|hypertensive|htn)\b/i.test(t))com.push('Hypertension');
+ if(com.length)setv('comorbidity',com.join(', '));
+
+ // Complaint, including "patient complaint".
+ m=t.match(/\b(?:patient\s+)?(?:chief\s+|presenting\s+)?complaint\s+(?:is|:)?\s*(.+?)(?=\s*$)/i);
+ if(m)setv('complaint',m[1]);
+
+ normalizeUnits();
+ const checks=[
+   ['patientName','patient name'],['patientId','patient ID'],['age','age'],['sex','sex'],
+   ['occupation','occupation'],['phone','phone'],['bp','blood pressure'],['sugar','blood sugar'],
+   ['pulse','pulse'],['weight','weight'],['comorbidity','known DM/HTN'],['complaint','chief complaint']
  ];
- for(const [id,ls] of specs){let v=segment(t,ls);if(v)setv(id,v)}
- let sex=t.match(/\b(male|female|man|woman)\b/i);if(sex)q('sex').value=/female|woman/i.test(sex[1])?'Female':'Male';
- // If a numeric field is spoken with units, strip units.
- ['age','pulse','weight','sugar'].forEach(id=>{let v=q(id).value.replace(/\b(years?|yrs?|kg|kilograms?|mg\/?dl)\b/ig,'').trim();q(id).value=v})
+ checks.forEach(([id,label])=>{if(new RegExp('\\b'+label.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\$&')+'\\b','i').test(t)&&!q(id)?.value)unresolved.push(label)});
 }
-function parseB(t){
+function parseB(t,unresolved=[]){
+ t=t.replace(/\s+/g,' ').trim();
  let m=t.match(/\b(right|left|both)\s+eye\b/i);if(m)q('eye').value=/right/i.test(m[1])?'Right (RE)':/left/i.test(m[1])?'Left (LE)':'Both (BE)';
  const yesno=[['pain','pain'],['redness','redness|red eye'],['itching','itch'],['tearing','tearing'],['fbs','foreign body sensation']];
- yesno.forEach(([id,pat])=>{if(new RegExp('\\bno\\s+(?:'+pat+')\\b','i').test(t))q(id).value='No';else if(new RegExp('\\b(?:'+pat+')\\b','i').test(t))q(id).value='Yes'});
- let d=t.match(/\bfor\s+(\d+\s*(?:day|days|week|weeks|month|months|year|years))\b/i);if(d)q('duration').value=d[1];
- if(/\bhalos?|glare\b/i.test(t))q('halos').value='Yes';if(/\bhazy|foggy|cloudy\b/i.test(t))q('hazy').value='Yes';if(/\bworse at night|night vision|especially at night\b/i.test(t))q('night').value='Yes';if(/\bbright light\b/i.test(t))q('bright').value='Yes';
- if(/\bspectacles?|glasses\b/i.test(t))q('spectacles').value='Yes';if(/\bno previous eye surgery\b/i.test(t))q('surgery').value='No';else if(/\bprevious eye surgery\b/i.test(t))q('surgery').value='Yes';
- q('nature').value=t;
-}
-function parseC(t){
- let m=t.match(/\b(?:right|re)\s*(?:eye)?\s*(?:is\s*)?(\d+\s*\/\s*\d+)/i);if(m)q('vaRE').value=m[1];
- m=t.match(/\b(?:left|le)\s*(?:eye)?\s*(?:is\s*)?(\d+\s*\/\s*\d+)/i);if(m)q('vaLE').value=m[1];
- m=t.match(/\b(?:bp|blood pressure)\s*(?:is\s*)?(\d{2,3}\s*\/\s*\d{2,3})/i);if(m)q('bp').value=m[1];
- m=t.match(/\b(?:rbs|fbs|blood sugar)\s*(?:is\s*)?(\d+(?:\.\d+)?)/i);if(m)q('sugar').value=m[1];
- m=t.match(/\bpupils?\s+(.+?)(?=,|$)/i);if(m)q('pupils').value=m[1];
-}
-function parseE(t){q('sbar').value=t}
+ yesno.forEach(([id,pat])=>{
+   if(new RegExp('\\bno\\s+(?:'+pat+')\\b','i').test(t))q(id).value='No';
+   else if(new RegExp('\\b(?:'+pat+')\\b','i').test(t))q(id).value='Yes';
+ });
+ m=t.match(/\bfor\s+(\d+\s*(?:day|days|week|weeks|month|months|year|years))\b/i);if(m)q('duration').value=m[1];
+ if(/\bhalos?|glare\b/i.test(t))q('halos').value='Yes';
+ if(/\bhazy|foggy|cloudy\b/i.test(t))q('hazy').value='Yes';
+ if(/\bworse at night|night vision|especially at night\b/i.test(t))q('night').value='Yes';
+ if(/\bbright light\b/i.test(t))q('bright').value='Yes';
+ if(/\bspectacles?|glasses\b/i.test(t))q('spectacles').value='Yes';
+ if(/\bno previous eye surgery\b/i.test(t))q('surgery').value='No';else if(/\bprevious eye surgery\b/i.test(t))q('surgery').value='Yes';
 
+ // Main symptom: capture after common complaint phrases rather than storing the whole transcript.
+ m=t.match(/\b(?:complaint|complains?\s+of|presenting\s+complaint)\s*(?:is|:)?\s*(.+?)(?=\s+(?:right|left|both)\s+eye\b|\s+onset\b|\s+duration\b|$)/i);
+ if(m)q('nature').value=cleanSpokenValue(m[1]);
+ if(/\b(?:right|left|both)\s+eye\b/i.test(t)&&q('eye')?.value==='Not assessed')unresolved.push('which eye');
+}
+function parseC(t,unresolved=[]){
+ t=t.replace(/\s+/g,' ').trim();
+ let m=t.match(/\b(?:right|re)\s*(?:eye)?\s*(?:is|:)?\s*(\d+\s*\/\s*\d+)\b/i);if(m)q('vaRE').value=m[1];
+ m=t.match(/\b(?:left|le)\s*(?:eye)?\s*(?:is|:)?\s*(\d+\s*\/\s*\d+)\b/i);if(m)q('vaLE').value=m[1];
+ m=t.match(/\b(?:bp|blood pressure)\s*(?:is|:)?\s*(\d{2,3})\s*(?:over|\/)\s*(\d{2,3})\b/i);if(m)q('bp').value=m[1]+'/'+m[2];
+ m=t.match(/\b(?:rbs|fbs|blood sugar)\s*(?:is|:)?\s*(not\s+done|\d+(?:\.\d+)?)\s*(mg\s*\/\s*dL|mmol\s*\/\s*L)?/i);if(m){q('sugar').value=m[1];if(m[2])q('sugarUnit').value=/mmol/i.test(m[2])?'mmol/L':'mg/dL'}
+ m=t.match(/\bpupils?\s+(.+?)(?=\s+(?:lids?|conjunctiva|cornea|discharge|iop)\b|$)/i);if(m)q('pupils').value=cleanSpokenValue(m[1]);
+ normalizeUnits();
+}
+function parseE(t,unresolved=[]){
+ t=t.replace(/\s+/g,' ').trim();
+ q('sbar').value=t;
+}
 function check(){
  let d=data(),t=(d.observations+' '+d.complaint+' '+d.trauma+' '+d.nature+' '+d.discharge+' '+d.flashes).toLowerCase(),flags=[];
  if(/chemical|acid|alkali|lime|cement|bleach/.test(t))flags.push('Possible chemical injury — irrigate immediately according to protocol and call doctor.');
