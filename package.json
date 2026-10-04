@@ -1,0 +1,11 @@
+{
+  "name": "ophthacheck",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "description": "Voice-first ophthalmic nursing clerking, completeness and handover assistant (prototype).",
+  "scripts": {
+    "test": "node tests/run.mjs && node tests/heldout.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}

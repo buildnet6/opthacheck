@@ -1,1 +1,15 @@
-{"name":"OphthaCheck","short_name":"OphthaCheck","start_url":"./","display":"standalone","background_color":"#f3f6f8","theme_color":"#123f63"}
+{
+  "name": "OphthaCheck - ophthalmic nursing clerking",
+  "short_name": "OphthaCheck",
+  "description": "Voice-first ophthalmic nursing clerking, completeness check and handover assistant (prototype).",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef3f6",
+  "theme_color": "#123f63",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
