@@ -95,7 +95,138 @@ function sbar(){let d=data(),a=[];if(d.age)a.push(d.age+'yr old');if(d.comorbidi
 function save(){let d=data();d.savedAt=new Date().toISOString();d.recordId=Date.now().toString();let a=records();a.unshift(d);localStorage.setItem(AK,JSON.stringify(a));renderHistory();alert('Saved to this nurse archive on this device.')}
 function renderHistory(){let s=S(),a=records().filter(x=>x.staffId===s?.id);q('history').innerHTML=a.length?'<table><tr><th>Date</th><th>Patient</th><th>ID</th><th>Complaint</th><th></th></tr>'+a.map(x=>`<tr><td>${new Date(x.savedAt).toLocaleString()}</td><td>${esc(x.patientName)}</td><td>${esc(x.patientId)}</td><td>${esc(x.complaint)}</td><td><button class="light" onclick="loadRec('${x.recordId}')">Open</button></td></tr>`).join('')+'</table>':'<p class="muted">No saved records.</p>'}
 function loadRec(id){let x=records().find(r=>r.recordId===id);if(!x)return;F.forEach(k=>{if(q(k))q(k).value=x[k]||''});check();scrollTo({top:0,behavior:'smooth'})}
-function dictate(id){let R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return alert('Speech recognition is not available in this browser.');let r=new R();r.lang='en-NG';r.interimResults=false;r.onresult=e=>{q(id).value+=(q(id).value?' ':'')+e.results[0][0].transcript;check()};r.onerror=e=>alert('Speech recognition: '+e.error);r.start()}
+let activeRecognition=null, activeTarget=null, finalTranscript='', stopRequested=false;
+
+function ensureDictationPanel(){
+  let p=q('dictationPanel');
+  if(!p){
+    p=document.createElement('div');
+    p.id='dictationPanel';
+    p.className='card no-print';
+    p.innerHTML=`<h2>🎙️ VOICE DICTATION</h2>
+      <div id="dictationStatus" class="alert warn"><b>Ready.</b> Press Start Dictation, then speak naturally.</div>
+      <div style="background:#f7f9fa;border:1px solid #ccd6dd;border-radius:7px;padding:10px;min-height:45px">
+        <b>Live transcript:</b><div id="liveTranscript" class="muted">Nothing heard yet.</div>
+      </div>
+      <div style="margin-top:8px">
+        <button class="green" id="startDictationBtn" onclick="startDictation()">🎙 Start Dictation</button>
+        <button class="red hidden" id="stopDictationBtn" onclick="stopDictation()">■ Stop Dictation</button>
+        <button class="light" onclick="clearDictationPreview()">Clear preview</button>
+      </div>`;
+    q('app').insertBefore(p,q('emergency'));
+  }
+}
+
+function dictate(id){
+  ensureDictationPanel();
+  activeTarget=id;
+  if(activeRecognition){ stopDictation(); return; }
+  startDictation();
+}
+
+function startDictation(){
+  ensureDictationPanel();
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!R){
+    q('dictationStatus').className='alert danger';
+    q('dictationStatus').innerHTML='<b>Speech recognition is unavailable in this browser.</b> Try current Chrome or Edge, and make sure the site is using HTTPS.';
+    return;
+  }
+  if(!activeTarget) activeTarget='observations';
+
+  stopRequested=false;
+  finalTranscript='';
+  q('liveTranscript').textContent='Listening… speak now.';
+  q('dictationStatus').className='alert ok';
+  q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — OphthaCheck is listening. Speak now. Press Stop Dictation when finished.';
+  q('startDictationBtn').classList.add('hidden');
+  q('stopDictationBtn').classList.remove('hidden');
+
+  const r=new R();
+  activeRecognition=r;
+  r.lang='en-US';
+  r.continuous=true;
+  r.interimResults=true;
+  r.maxAlternatives=1;
+
+  r.onstart=()=>{
+    q('dictationStatus').className='alert ok';
+    q('dictationStatus').innerHTML='<b>🟢 LISTENING</b> — Speak now. Press Stop Dictation when finished.';
+  };
+
+  r.onresult=(event)=>{
+    let interim='';
+    for(let i=event.resultIndex;i<event.results.length;i++){
+      const text=event.results[i][0].transcript;
+      if(event.results[i].isFinal) finalTranscript+=(finalTranscript?' ':'')+text;
+      else interim+=(interim?' ':'')+text;
+    }
+    q('liveTranscript').textContent=(finalTranscript+(interim?' '+interim:'')).trim()||'Listening…';
+  };
+
+  r.onerror=(event)=>{
+    const friendly={
+      'not-allowed':'Microphone permission was denied. Click the lock/microphone icon beside the address bar and allow microphone access, then try again.',
+      'service-not-allowed':'The browser speech-recognition service is unavailable. Try Chrome/Edge while online.',
+      'no-speech':'No speech was detected. Press Start and speak clearly.',
+      'audio-capture':'No microphone was available. Check the computer microphone.',
+      'network':'The browser speech-recognition service needs network access.',
+      'aborted':'Dictation was stopped.'
+    };
+    q('dictationStatus').className='alert danger';
+    q('dictationStatus').innerHTML='<b>Dictation error:</b> '+esc(friendly[event.error]||event.error);
+  };
+
+  r.onend=()=>{
+    activeRecognition=null;
+    q('startDictationBtn').classList.remove('hidden');
+    q('stopDictationBtn').classList.add('hidden');
+
+    if(finalTranscript.trim()){
+      const target=q(activeTarget);
+      if(target){
+        target.value+=(target.value?' ':'')+finalTranscript.trim();
+      }
+      q('dictationStatus').className='alert ok';
+      q('dictationStatus').innerHTML='<b>✓ Dictation captured.</b> The text has been placed in the selected field. You can edit it before checking.';
+      check();
+    }else if(!stopRequested){
+      q('dictationStatus').className='alert warn';
+      q('dictationStatus').innerHTML='<b>No speech captured.</b> Press Start Dictation and speak clearly.';
+    }else{
+      q('dictationStatus').className='alert warn';
+      q('dictationStatus').innerHTML='<b>Dictation stopped.</b> No final words were captured.';
+    }
+  };
+
+  try{r.start()}
+  catch(e){
+    activeRecognition=null;
+    q('startDictationBtn').classList.remove('hidden');
+    q('stopDictationBtn').classList.add('hidden');
+    q('dictationStatus').className='alert danger';
+    q('dictationStatus').innerHTML='<b>Could not start microphone:</b> '+esc(e.message);
+  }
+}
+
+function stopDictation(){
+  stopRequested=true;
+  if(activeRecognition){
+    q('dictationStatus').className='alert warn';
+    q('dictationStatus').innerHTML='<b>Stopping…</b> Finishing the current speech recognition result.';
+    try{activeRecognition.stop()}catch(e){}
+  }
+}
+
+function clearDictationPreview(){
+  if(q('liveTranscript')) q('liveTranscript').textContent='Nothing heard yet.';
+  if(q('dictationStatus')){
+    q('dictationStatus').className='alert warn';
+    q('dictationStatus').innerHTML='<b>Ready.</b> Press Start Dictation, then speak naturally.';
+  }
+}
+
+ensureDictationPanel();
 function blob(text,type,name){let b=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function exportJSON(){blob(JSON.stringify(data(),null,2),'application/json','opthacheck-record.json')}
 async function share(){sbar();let d=data(),text=`OphthaCheck record\nNurse: ${d.nurseName} (${d.staffId})\nPatient: ${d.patientName}\nID: ${d.patientId}\nSBAR: ${d.sbar}`;if(navigator.share){try{await navigator.share({title:'OphthaCheck — '+d.patientName,text})}catch(e){}}else alert('Native sharing is unavailable here. Use Print → Save PDF or WhatsApp/Email.')}
