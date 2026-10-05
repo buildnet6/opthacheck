@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123f63">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+<title>OphthaCheck evaluation bench</title>
+<style>
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 10px 0; }
+  .metric { background: var(--navy-tint); border-radius: 8px; padding: 10px 12px; }
+  .metric b { display: block; font-size: 22px; color: var(--navy); }
+  .metric span { font-size: 12.5px; color: var(--muted); }
+  .r-correct { color: var(--ok); } .r-bad { color: var(--danger); font-weight: 650; } .r-amb { color: var(--review); }
+  details { border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; margin: 6px 0; background: #fff; }
+  summary { cursor: pointer; font-weight: 650; }
+  .vignette { background: #fff8e6; border-left: 4px solid var(--review-line); padding: 12px; border-radius: 6px; font-size: 16px; line-height: 1.55; }
+  .secdict { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 8px 0; background: #fff; }
+  .secdict[data-vs="LISTENING"], .secdict[data-vs="TRANSCRIBING"] { border-color: var(--live); box-shadow: 0 0 0 3px var(--live-bg); }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><div class="brand">OphthaCheck <small>evaluation bench</small></div><a class="chip" href="./">← Back to clerking</a></div></header>
+<main class="screen" style="padding-bottom:40px">
+  <div class="card">
+    <h1 style="margin:0 0 4px;color:var(--navy);font-size:22px">Evaluation bench</h1>
+    <p class="muted" style="margin:0">Synthetic, fictional cases only (Bible §20). The benchmark replays reference transcripts; the blind test lets a nurse dictate a case she has only read as a vignette, then scores the engine against the independently recorded answer.</p>
+    <div class="tabs" role="tablist"><button role="tab" aria-selected="true" id="tb1" type="button">Benchmark</button><button role="tab" aria-selected="false" id="tb2" type="button">Blind dictation test</button><button role="tab" aria-selected="false" id="tb3" type="button">Saved trials</button></div>
+    <section id="p1"></section>
+    <section id="p2" class="hidden"></section>
+    <section id="p3" class="hidden"></section>
+  </div>
+</main>
+<div id="toast" class="toast hidden" role="status"></div>
+<script type="module">
+import { CASES } from './tests/cases.js';
+import { HELDOUT } from './tests/heldout.js';
+import { scoreCase, summarise } from './js/evaluate.js';
+import { FIELD, VERSION } from './js/schema.js';
+import { Dictation, drawMeter, speechSupported, STATES } from './js/voice.js';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 2600); };
+const TK = 'oc7_trials';
+const trials = () => { try { return JSON.parse(localStorage.getItem(TK) || '[]'); } catch { return []; } };
+
+function tab(n) { [1, 2, 3].forEach(i => { $(`#tb${i}`).setAttribute('aria-selected', i === n); $(`#p${i}`).classList.toggle('hidden', i !== n); }); if (n === 3) renderTrials(); }
+$('#tb1').onclick = () => tab(1); $('#tb2').onclick = () => tab(2); $('#tb3').onclick = () => tab(3);
+
+function metricsHTML(s) {
+  const m = [['Field accuracy', `${s.fieldAccuracy}%`], ['Missing-field rate', `${s.missingRate}%`], ['Wrong-value rate', `${s.wrongValueRate}%`], ['Wrong-field rate', `${s.wrongFieldRate}%`], ['False positives', s.falsePositives], ['Ambiguity detection', `${s.ambiguityDetection}%`], ['Red-flag sensitivity', `${s.redFlagSensitivity}%`], ['Red-flag false alarms', s.redFlagFalseAlarms]];
+  return `<div class="metrics">${m.map(([l, v]) => `<div class="metric"><b>${v}</b><span>${l}</span></div>`).join('')}</div>`;
+}
+function rowsHTML(r) {
+  return `<table><thead><tr><th>Field</th><th>Expected</th><th>Engine</th><th>Result</th></tr></thead><tbody>${r.rows.map(x => `<tr><td>${esc(FIELD[x.field]?.label || x.field)}</td><td>${esc(x.expected)}</td><td>${esc(x.got)}</td><td class="${x.result === 'correct' ? 'r-correct' : x.result.startsWith('ambiguity c') ? 'r-amb' : 'r-bad'}">${esc(x.result)}</td></tr>`).join('')}</tbody></table>
+  ${r.flags.expected.length || r.flags.fired.length ? `<p class="muted">Red flags expected: ${esc(r.flags.expected.join(', ') || 'none')} · fired: ${esc(r.flags.fired.join(', ') || 'none')}</p>` : ''}`;
+}
+function bench(title, cases, note) {
+  const res = cases.map(c => scoreCase(c)), s = summarise(res);
+  return `<h3 style="margin:16px 0 0">${title} <span class="muted">(${cases.length} cases, ${s.expectedFields} fields)</span></h3><p class="muted" style="margin:2px 0">${note}</p>${metricsHTML(s)}
+    ${res.map(r => `<details><summary>${r.rows.every(x => ['correct', 'ambiguity caught'].includes(x.result)) ? '✓' : '✗'} ${esc(r.id)} ${esc(r.title)} - ${r.correct}/${r.total}</summary>${rowsHTML(r)}</details>`).join('')}`;
+}
+$('#p1').innerHTML = `<p class="muted">Engine v${VERSION}. Re-run after every change to the extraction rules and compare with earlier versions.</p>`
+  + bench('Development cases', CASES, 'Written alongside the rules - a regression suite, not proof of accuracy.')
+  + bench('Held-out cases', HELDOUT, 'Phrased differently and not used to write the rules - the more honest estimate.');
+
+// ── blind dictation test ──
+let cur = null, t0 = null;
+const SECS = [['A', 'Biodata & vitals'], ['B', 'History'], ['C', 'Examination'], ['E', 'Plan']];
+$('#p2').innerHTML = `<div class="form-grid" style="margin-top:8px"><div><label for="bxCase">Case</label><select id="bxCase">${CASES.map(c => `<option value="${c.id}">${c.id} - ${esc(c.title)}</option>`).join('')}</select></div><div><label for="bxWho">Evaluating nurse (initials)</label><input id="bxWho"></div></div>
+  <p><button class="btn" type="button" id="bxStart">Start case</button></p><div id="bxBody"></div>`;
+const dict = new Dictation({ lang: (JSON.parse(localStorage.getItem('oc7_prefs') || '{}').lang) || 'en-GB',
+  onState: (sec, st) => { const b = $(`#bx_${sec}`); if (!b) return; b.dataset.vs = st; $(`#bxs_${sec}`).textContent = STATES[st]; $(`#bxd_${sec}`).disabled = dict.busy; $(`#bxp_${sec}`).disabled = !(dict.busy && dict.section === sec); },
+  onText: (sec, text) => { $(`#bxt_${sec}`).value = text; },
+  onLevel: (sec, l, s, closed) => { const c = $(`#bxc_${sec}`); if (c) drawMeter(c, closed ? 0 : l); },
+  onError: (sec, msg) => toast(msg) });
+$('#bxStart').onclick = () => {
+  cur = CASES.find(c => c.id === $('#bxCase').value); t0 = Date.now();
+  $('#bxBody').innerHTML = `<div class="vignette"><b>Read, then dictate as you normally would.</b><br>${esc(cur.vignette)}</div>
+    ${SECS.map(([s, t]) => `<div class="secdict" id="bx_${s}" data-vs="READY"><div class="row"><b>${s}. ${t}</b><span class="spacer"></span>
+      <button class="btn ghost sm" type="button" id="bxd_${s}" ${speechSupported ? '' : 'disabled'}>🎙 Dictate</button><button class="btn stop sm" type="button" id="bxp_${s}" disabled>■ Stop</button>
+      <span class="meter" style="display:inline-block;width:110px;height:24px;background:#0e1a22;border-radius:6px;padding:3px"><canvas id="bxc_${s}" width="120" height="18" style="width:100%;height:100%"></canvas></span><span class="vstate" id="bxs_${s}">${speechSupported ? 'Ready' : 'Type'}</span></div>
+      <textarea id="bxt_${s}" placeholder="Transcript (dictate or type)"></textarea></div>`).join('')}
+    <div class="row"><button class="btn go" type="button" id="bxScore">Score this attempt</button><span class="muted">The expected answer stays hidden until you score.</span></div><div id="bxOut"></div>`;
+  for (const [s] of SECS) { $(`#bxd_${s}`).onclick = () => dict.start(s, $(`#bxt_${s}`).value); $(`#bxp_${s}`).onclick = () => dict.stop(); }
+  $('#bxScore').onclick = scoreAttempt;
+};
+function scoreAttempt() {
+  if (dict.busy) dict.stop();
+  const dictation = {}; for (const [s] of SECS) { const v = $(`#bxt_${s}`).value.trim(); if (v) dictation[s] = v; }
+  if (!Object.keys(dictation).length) { toast('Nothing dictated yet.'); return; }
+  const r = scoreCase(cur, dictation), s = summarise([r]);
+  const secs = Math.round((Date.now() - t0) / 1000);
+  $('#bxOut').innerHTML = `${metricsHTML(s)}<p class="muted">Time from start to score: ${Math.floor(secs / 60)}m ${secs % 60}s</p>${rowsHTML(r)}
+    <label for="bxNotes">Nurse's review notes (transcription errors, wrong placements, usability)</label><textarea id="bxNotes"></textarea>
+    <p><button class="btn" type="button" id="bxSave">Save trial</button></p>`;
+  $('#bxSave').onclick = () => {
+    const all = trials();
+    all.unshift({ at: new Date().toISOString(), version: VERSION, caseId: cur.id, nurse: $('#bxWho').value.trim(), seconds: secs, speech: speechSupported, dictation, summary: s,
+      errors: r.rows.filter(x => !['correct', 'ambiguity caught'].includes(x.result)), notes: $('#bxNotes').value.trim() });
+    localStorage.setItem(TK, JSON.stringify(all)); toast('Trial saved on this device.'); $('#bxSave').disabled = true;
+  };
+}
+function renderTrials() {
+  const t = trials();
+  $('#p3').innerHTML = t.length ? `<div class="row" style="margin:8px 0"><button class="btn sm ghost" type="button" id="exJ">Export JSON</button><button class="btn sm ghost" type="button" id="exC">Export CSV</button><button class="btn sm line" type="button" id="exX">Clear all</button></div>
+    <table><thead><tr><th>When</th><th>Case</th><th>Nurse</th><th>Version</th><th>Accuracy</th><th>Errors</th><th>Time</th></tr></thead><tbody>${t.map(x => `<tr><td>${new Date(x.at).toLocaleString('en-GB')}</td><td>${esc(x.caseId)}</td><td>${esc(x.nurse)}</td><td>${esc(x.version)}</td><td>${x.summary.fieldAccuracy}%</td><td>${x.errors.length}</td><td>${x.seconds}s</td></tr>`).join('')}</tbody></table>`
+    : '<p class="muted" style="margin-top:10px">No saved trials yet. Run a blind dictation test and save it.</p>';
+  if (!t.length) return;
+  const dl = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); };
+  $('#exJ').onclick = () => dl(`ophthacheck-trials-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(t, null, 1), 'application/json');
+  $('#exC').onclick = () => { const h = ['at', 'version', 'caseId', 'nurse', 'seconds', 'fieldAccuracy', 'missingRate', 'wrongValueRate', 'wrongFieldRate', 'falsePositives', 'ambiguityDetection', 'redFlagSensitivity', 'errors', 'notes'];
+    const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    dl(`ophthacheck-trials-${new Date().toISOString().slice(0, 10)}.csv`, [h.join(','), ...t.map(x => [x.at, x.version, x.caseId, x.nurse, x.seconds, x.summary.fieldAccuracy, x.summary.missingRate, x.summary.wrongValueRate, x.summary.wrongFieldRate, x.summary.falsePositives, x.summary.ambiguityDetection, x.summary.redFlagSensitivity, x.errors.map(e => `${e.field}:${e.result}`).join('; '), x.notes].map(q).join(','))].join('\n'), 'text/csv'); };
+  $('#exX').onclick = () => { if (confirm('Delete all saved trials on this device?')) { localStorage.removeItem(TK); renderTrials(); } };
+}
+</script>
+</body>
+</html>
