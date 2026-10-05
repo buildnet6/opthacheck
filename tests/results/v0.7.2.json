@@ -1,0 +1,1236 @@
+{
+ "version": "0.7.2",
+ "at": "2026-10-05T09:21:34.084Z",
+ "summary": {
+  "cases": 12,
+  "expectedFields": 151,
+  "fieldAccuracy": 100,
+  "missingRate": 0,
+  "wrongValueRate": 0,
+  "wrongFieldRate": 0,
+  "falsePositives": 0,
+  "ambiguityDetection": 100,
+  "redFlagSensitivity": 100,
+  "redFlagFalseAlarms": 0
+ },
+ "cases": [
+  {
+   "id": "SC01",
+   "title": "Bilateral gradual visual loss (cataract pattern)",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Toby Daniels",
+     "got": "Toby Daniels",
+     "result": "correct"
+    },
+    {
+     "field": "patientId",
+     "expected": "UCH4567",
+     "got": "UCH4567",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "57",
+     "got": "57",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "occupation",
+     "expected": "Trader",
+     "got": "Trader",
+     "result": "correct"
+    },
+    {
+     "field": "phone",
+     "expected": "08031234567",
+     "got": "08031234567",
+     "result": "correct"
+    },
+    {
+     "field": "bp",
+     "expected": "150/90",
+     "got": "150/90",
+     "result": "correct"
+    },
+    {
+     "field": "sugar",
+     "expected": "200",
+     "got": "200",
+     "result": "correct"
+    },
+    {
+     "field": "sugarUnit",
+     "expected": "mg/dL",
+     "got": "mg/dL",
+     "result": "correct"
+    },
+    {
+     "field": "pulse",
+     "expected": "80",
+     "got": "80",
+     "result": "correct"
+    },
+    {
+     "field": "weight",
+     "expected": "85",
+     "got": "85",
+     "result": "correct"
+    },
+    {
+     "field": "dm",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "htn",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "Foggy vision in both eyes for 1 year",
+     "got": "Foggy vision in both eyes for 1 year",
+     "result": "correct"
+    },
+    {
+     "field": "hazy",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Both (BE)",
+     "got": "Both (BE)",
+     "result": "correct"
+    },
+    {
+     "field": "onset",
+     "expected": "Gradual",
+     "got": "Gradual",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "1 year",
+     "got": "1 year",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "redness",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "halos",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "night",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "bright",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "cataractFamily",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "surgery",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "6/36",
+     "got": "6/36",
+     "result": "correct"
+    },
+    {
+     "field": "vaPHRE",
+     "expected": "6/18",
+     "got": "6/18",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "6/60",
+     "got": "6/60",
+     "result": "correct"
+    },
+    {
+     "field": "vaPHLE",
+     "expected": "6/24",
+     "got": "6/24",
+     "result": "correct"
+    },
+    {
+     "field": "pupils",
+     "expected": "Black and round",
+     "got": "Black and round",
+     "result": "correct"
+    },
+    {
+     "field": "referral",
+     "expected": "Slit lamp and cataract grading",
+     "got": "Slit lamp and cataract grading",
+     "result": "correct"
+    },
+    {
+     "field": "priority",
+     "expected": "Routine",
+     "got": "Routine",
+     "result": "correct"
+    }
+   ],
+   "correct": 32,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 32,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [],
+    "fired": [],
+    "hit": 0,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC02",
+   "title": "Speech-recognition homophones and number words",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Mrs Adunni Okafor",
+     "got": "Mrs Adunni Okafor",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "63",
+     "got": "63",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Female",
+     "got": "Female",
+     "result": "correct"
+    },
+    {
+     "field": "occupation",
+     "expected": "Retired teacher",
+     "got": "Retired teacher",
+     "result": "correct"
+    },
+    {
+     "field": "bp",
+     "expected": "140/85",
+     "got": "140/85",
+     "result": "correct"
+    },
+    {
+     "field": "pulse",
+     "expected": "72",
+     "got": "72",
+     "result": "correct"
+    },
+    {
+     "field": "weight",
+     "expected": "70",
+     "got": "70",
+     "result": "correct"
+    },
+    {
+     "field": "sugar",
+     "expected": "6.5",
+     "got": "6.5",
+     "result": "correct"
+    },
+    {
+     "field": "sugarUnit",
+     "expected": "mmol/L",
+     "got": "mmol/L",
+     "result": "correct"
+    },
+    {
+     "field": "dm",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "Blurred vision in the left eye for 6 months",
+     "got": "Blurred vision in the left eye for 6 months",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Left (LE)",
+     "got": "Left (LE)",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "6 months",
+     "got": "6 months",
+     "result": "correct"
+    }
+   ],
+   "correct": 13,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 13,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [],
+    "fired": [],
+    "hit": 0,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC03",
+   "title": "Chemical injury - emergency override",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Musa Bello",
+     "got": "Musa Bello",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "34",
+     "got": "34",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "occupation",
+     "expected": "Bricklayer",
+     "got": "Bricklayer",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "Cement splashed into the right eye",
+     "got": "Cement splashed into the right eye",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Right (RE)",
+     "got": "Right (RE)",
+     "result": "correct"
+    },
+    {
+     "field": "chemical",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "chemicalAgent",
+     "expected": "Cement",
+     "got": "Cement",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "30 minutes",
+     "got": "30 minutes",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "painDetail",
+     "expected": "Severe",
+     "got": "Severe",
+     "result": "correct"
+    },
+    {
+     "field": "redness",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "tearing",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "CF 1m",
+     "got": "CF 1m",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "6/6",
+     "got": "6/6",
+     "result": "correct"
+    }
+   ],
+   "correct": 15,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 15,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "chemical"
+    ],
+    "fired": [
+     "chemical"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC04",
+   "title": "Acute painful red eye with vomiting",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Grace Eze",
+     "got": "Grace Eze",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "68",
+     "got": "68",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Female",
+     "got": "Female",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Left (LE)",
+     "got": "Left (LE)",
+     "result": "correct"
+    },
+    {
+     "field": "onset",
+     "expected": "Sudden",
+     "got": "Sudden",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "painDetail",
+     "expected": "Severe",
+     "got": "Severe",
+     "result": "correct"
+    },
+    {
+     "field": "redness",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "Since this morning",
+     "got": "Since this morning",
+     "result": "correct"
+    },
+    {
+     "field": "headache",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "vomiting",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "halos",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "6/12",
+     "got": "6/12",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "HM",
+     "got": "HM",
+     "result": "correct"
+    },
+    {
+     "field": "midDilated",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "iopRE",
+     "expected": "16",
+     "got": "16",
+     "result": "correct"
+    },
+    {
+     "field": "iopLE",
+     "expected": "52",
+     "got": "52",
+     "result": "correct"
+    }
+   ],
+   "correct": 17,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 17,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "angle"
+    ],
+    "fired": [
+     "angle"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC05",
+   "title": "Newborn with purulent discharge",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Chukwuemeka Obi",
+     "got": "Chukwuemeka Obi",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "2",
+     "got": "2",
+     "result": "correct"
+    },
+    {
+     "field": "ageUnit",
+     "expected": "weeks",
+     "got": "weeks",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "Thick yellow discharge from both eyes for 3 days",
+     "got": "Thick yellow discharge from both eyes for 3 days",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Both (BE)",
+     "got": "Both (BE)",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "3 days",
+     "got": "3 days",
+     "result": "correct"
+    },
+    {
+     "field": "discharge",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "dischargeDetail",
+     "expected": "Purulent",
+     "got": "Purulent",
+     "result": "correct"
+    },
+    {
+     "field": "lids",
+     "expected": "Swollen",
+     "got": "Swollen",
+     "result": "correct"
+    }
+   ],
+   "correct": 10,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 10,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "newborn"
+    ],
+    "fired": [
+     "newborn"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC06",
+   "title": "Flashes, floaters and a curtain",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Ibrahim Sule",
+     "got": "Ibrahim Sule",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "45",
+     "got": "45",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Right (RE)",
+     "got": "Right (RE)",
+     "result": "correct"
+    },
+    {
+     "field": "flashes",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "floaters",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "2 days",
+     "got": "2 days",
+     "result": "correct"
+    },
+    {
+     "field": "curtain",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "spectacles",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "6/24",
+     "got": "6/24",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "6/9",
+     "got": "6/9",
+     "result": "correct"
+    }
+   ],
+   "correct": 12,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 12,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "curtain"
+    ],
+    "fired": [
+     "curtain"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC07",
+   "title": "White pupil in a child",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Aisha Lawal",
+     "got": "Aisha Lawal",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "3",
+     "got": "3",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Female",
+     "got": "Female",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "White reflex in the left eye in photographs",
+     "got": "White reflex in the left eye in photographs",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Left (LE)",
+     "got": "Left (LE)",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "Not possible",
+     "got": "Not possible",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "Not possible",
+     "got": "Not possible",
+     "result": "correct"
+    },
+    {
+     "field": "whitePupil",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    }
+   ],
+   "correct": 8,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 8,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "whitePupil"
+    ],
+    "fired": [
+     "whitePupil"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC08",
+   "title": "Ambiguous numbers must not be guessed",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Kemi Ade",
+     "got": "Kemi Ade",
+     "result": "correct"
+    },
+    {
+     "field": "iopRE",
+     "expected": "18",
+     "got": "18",
+     "result": "correct"
+    },
+    {
+     "field": "iopLE",
+     "expected": "21",
+     "got": "21",
+     "result": "correct"
+    },
+    {
+     "field": "bp",
+     "expected": "(flag for review)",
+     "got": "flagged",
+     "result": "ambiguity caught"
+    },
+    {
+     "field": "pulse",
+     "expected": "(flag for review)",
+     "got": "flagged",
+     "result": "ambiguity caught"
+    },
+    {
+     "field": "weight",
+     "expected": "(flag for review)",
+     "got": "flagged",
+     "result": "ambiguity caught"
+    }
+   ],
+   "correct": 3,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 3,
+   "ambiguity": {
+    "caught": 3,
+    "total": 3
+   },
+   "flags": {
+    "expected": [],
+    "fired": [],
+    "hit": 0,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC09",
+   "title": "Trauma with padded eye, reason unknown",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Unknown",
+     "got": "Unknown",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "25",
+     "got": "25",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Right (RE)",
+     "got": "Right (RE)",
+     "result": "correct"
+    },
+    {
+     "field": "trauma",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "traumaDetail",
+     "expected": "Assaulted in a fight",
+     "got": "Assaulted in a fight",
+     "result": "correct"
+    },
+    {
+     "field": "bleeding",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "paddedEye",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "padReason",
+     "expected": "Unknown",
+     "got": "Unknown",
+     "result": "correct"
+    }
+   ],
+   "correct": 9,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 9,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "penetrating",
+     "pad"
+    ],
+    "fired": [
+     "penetrating",
+     "pad"
+    ],
+    "hit": 2,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC10",
+   "title": "Allergic conjunctivitis - routine",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Tunde Ajayi",
+     "got": "Tunde Ajayi",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "19",
+     "got": "19",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Male",
+     "got": "Male",
+     "result": "correct"
+    },
+    {
+     "field": "complaint",
+     "expected": "Itching and redness of both eyes for 2 weeks",
+     "got": "Itching and redness of both eyes for 2 weeks",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Both (BE)",
+     "got": "Both (BE)",
+     "result": "correct"
+    },
+    {
+     "field": "duration",
+     "expected": "2 weeks",
+     "got": "2 weeks",
+     "result": "correct"
+    },
+    {
+     "field": "itching",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "redness",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "tearing",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "discharge",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "6/6",
+     "got": "6/6",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "6/6",
+     "got": "6/6",
+     "result": "correct"
+    },
+    {
+     "field": "education",
+     "expected": "Advised not to rub the eyes",
+     "got": "Advised not to rub the eyes",
+     "result": "correct"
+    },
+    {
+     "field": "referral",
+     "expected": "General clinic",
+     "got": "General clinic",
+     "result": "correct"
+    },
+    {
+     "field": "priority",
+     "expected": "Routine",
+     "got": "Routine",
+     "result": "correct"
+    }
+   ],
+   "correct": 16,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 16,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [],
+    "fired": [],
+    "hit": 0,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC11",
+   "title": "Dilation documented with time",
+   "rows": [
+    {
+     "field": "dropsGiven",
+     "expected": "Tropicamide 1%",
+     "got": "Tropicamide 1%",
+     "result": "correct"
+    },
+    {
+     "field": "dropsTime",
+     "expected": "10:30",
+     "got": "10:30",
+     "result": "correct"
+    },
+    {
+     "field": "dilated",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "dilationAgent",
+     "expected": "Tropicamide 1%",
+     "got": "Tropicamide 1%",
+     "result": "correct"
+    },
+    {
+     "field": "investigations",
+     "expected": "RBS sent",
+     "got": "RBS sent",
+     "result": "correct"
+    },
+    {
+     "field": "referral",
+     "expected": "Retina clinic",
+     "got": "Retina clinic",
+     "result": "correct"
+    },
+    {
+     "field": "priority",
+     "expected": "Urgent",
+     "got": "Urgent",
+     "result": "correct"
+    }
+   ],
+   "correct": 7,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 7,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [],
+    "fired": [],
+    "hit": 0,
+    "falseAlarms": []
+   }
+  },
+  {
+   "id": "SC12",
+   "title": "Sudden painless loss of vision",
+   "rows": [
+    {
+     "field": "patientName",
+     "expected": "Bose Adewale",
+     "got": "Bose Adewale",
+     "result": "correct"
+    },
+    {
+     "field": "age",
+     "expected": "72",
+     "got": "72",
+     "result": "correct"
+    },
+    {
+     "field": "sex",
+     "expected": "Female",
+     "got": "Female",
+     "result": "correct"
+    },
+    {
+     "field": "htn",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "eye",
+     "expected": "Right (RE)",
+     "got": "Right (RE)",
+     "result": "correct"
+    },
+    {
+     "field": "suddenLoss",
+     "expected": "Yes",
+     "got": "Yes",
+     "result": "correct"
+    },
+    {
+     "field": "pain",
+     "expected": "No",
+     "got": "No",
+     "result": "correct"
+    },
+    {
+     "field": "vaRE",
+     "expected": "PL",
+     "got": "PL",
+     "result": "correct"
+    },
+    {
+     "field": "vaLE",
+     "expected": "6/9",
+     "got": "6/9",
+     "result": "correct"
+    }
+   ],
+   "correct": 9,
+   "wrong": 0,
+   "missing": 0,
+   "wrongField": 0,
+   "falsePos": 0,
+   "total": 9,
+   "ambiguity": {
+    "caught": 0,
+    "total": 0
+   },
+   "flags": {
+    "expected": [
+     "suddenLoss"
+    ],
+    "fired": [
+     "suddenLoss"
+    ],
+    "hit": 1,
+    "falseAlarms": []
+   }
+  }
+ ]
+}
