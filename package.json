@@ -1,6 +1,6 @@
 {
   "name": "ophthacheck",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "description": "Voice-first ophthalmic nursing clerking, completeness and handover assistant (prototype).",

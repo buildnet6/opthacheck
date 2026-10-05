@@ -105,7 +105,7 @@ const P = {
     return { value: id, conf: 'medium', note: 'Check the ID against the folder/card' };
   },
   phone(s) {
-    let v = cleanSeg(s).replace(/(?<=\d|\s|^)o(?=\s|\d|$)/gi, '0').replace(/\bdouble\s+(\d)/gi, '$1$1').replace(/\btriple\s+(\d)/gi, '$1$1$1');
+    let v = cleanSeg(s).replace(/(^|[\d\s])o(?=\s|\d|$)/gi, (m, pre) => `${pre}0`).replace(/(^|[\d\s])o(?=\s|\d|$)/gi, (m, pre) => `${pre}0`).replace(/\bdouble\s+(\d)/gi, '$1$1').replace(/\btriple\s+(\d)/gi, '$1$1$1');
     const digits = (v.match(/^\+?[\d\s\-()]+/) || [''])[0].replace(/[^\d+]/g, '');
     const d = digits.replace(/\D/g, '');
     if (d.length < 7) return { error: `phone number incomplete ("${v}")` };
@@ -236,7 +236,8 @@ function findIOPs(s) { return nums(String(s).replace(/(?:mm\s?hg|millimet(?:er|r
 
 // ── matcher construction (cached per section) ─────────────────────────
 const cache = {};
-function wrap(src) { return new RegExp(`(?<![A-Za-z0-9])(?:${src})(?![A-Za-z0-9])`, 'gi'); }
+// no look-behind: keeps the engine working on older iPhones (Safari < 16.4)
+function wrap(src) { return new RegExp(`(^|[^A-Za-z0-9])((?:${src}))(?![A-Za-z0-9])`, 'gi'); }
 function matchers(section) {
   if (cache[section]) return cache[section];
   const list = [];
@@ -304,7 +305,7 @@ export function extract(section, raw, ctx = {}) {
   let hits = [];
   for (const m of matchers(section)) {
     m.re.lastIndex = 0;
-    for (const x of text.matchAll(m.re)) if (x[0].length) hits.push({ ...m, start: x.index, end: x.index + x[0].length, len: x[0].length, text: x[0] });
+    for (const x of text.matchAll(m.re)) if (x[2].length) { const st = x.index + x[1].length; hits.push({ ...m, start: st, end: st + x[2].length, len: x[2].length, text: x[2] }); }
   }
   const pats = patterns(section, text, ctx.values || {});
   hits = hits.filter(h => !pats.some(p => p.start <= h.start && h.end <= p.end && p.end - p.start > h.len));

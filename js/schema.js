@@ -4,7 +4,7 @@
 // Alias forms:  'regex'  |  { re:'regex', val:'value' }  (a phrase that carries its own value)
 //               { re:'regex', local:true }  (only active while dictating this field's own section)
 
-export const VERSION = '0.7.0';
+export const VERSION = '0.7.1';
 
 export const TRI = ['Not assessed', 'Yes', 'No'];
 export const NA = 'Not assessed';

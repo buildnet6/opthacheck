@@ -63,6 +63,7 @@ async function boot() {
   try { await migrateLegacy(); } catch (e) { console.warn(e); }
   requestPersistence();
   bindLogin(); bindApp();
+  window.__ocBooted = true;
   const sess = JSON.parse(sessionStorage.getItem(SESSION) || 'null');
   const p = sess && await db.getProfile(sess.id);
   if (p) { S.nurse = { id: p.id, name: p.name, rank: p.rank || '', clockIn: sess.clockIn }; await startApp(); }
@@ -94,7 +95,7 @@ function bindLogin() {
     const p = await db.getProfile(id);
     if (!p) { $('#siErr').textContent = 'No profile with that Staff ID on this device. Create one in "New nurse profile".'; return; }
     if (!(await verifyPin(p, pin))) { $('#siErr').textContent = 'Wrong PIN.'; await db.audit({ staffId: id, action: 'sign-in failed' }); return; }
-    await signIn(p);
+    try { await signIn(p); } catch (err) { $('#siErr').textContent = `Could not open the app: ${err.message}`; window.__ocShowError?.(`App error: ${err.message}`); }
   };
   $('#createForm').onsubmit = async e => {
     e.preventDefault();
